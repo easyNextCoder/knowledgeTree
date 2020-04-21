@@ -81,3 +81,21 @@ virtual函数动态绑定而来，意思是调用一个virtual函数时，究竟
 * 多重继承的确有正当用途。其中一个情节涉及"public继承某个Interface class"和"private 继承某个协助实现class"的两相组合。
 
 * **注意：仔细思考，private继承的含义是表述，继承类以何种方式向外对客户展示基类成员**
+
+## 条款51：编写new和delete时需固守常规
+
+* 针对class X而设计的operator new,其行为很典型地只为大小刚好为sizeof(X)的对象设计，然而一旦被继承下去，有可能base class的operator new被调用用以分配derived class对象。
+
+* 设计new时候的准则
+	* operator new应该内含一个无穷循环，并在其中尝试分配内存，如果它无法满足内存需求，就该调用new-handler。
+	* 它也应该有能力处理0 bytes申请。class专属版本则还应该处理“比正确大小更大的错误申请”
+* 在设计operator new[]需要遵守的规则：
+	* base class中的operator new[]有可能经由继承被调用，将内存分配给“元素为derived class对象”的array使用，而derived class对象通常比base class对象大。而且动态分配的arrays可能包含额外空间用来存放元素个数。
+
+* 写delete时需要注意的准则：
+	* 处理好delete NULL
+	* 使用与new对应的delete.
+
+* 关于placement new 和placement delete
+	* placement delete只有在“伴随placement new”调用而触发的构造函数出现异常时才会被调用。对着一个指针施行delete绝对不会导致调用placement delete（即使这个内存是通过placement new申请的）。
+	* 为用户定义的placement new 会掩盖系统中自带的new函数，所以用户再使用new申请内存的时候会出错（**用相应的代码测试**）
