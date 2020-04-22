@@ -27,29 +27,6 @@ https://www.nowcoder.com/practice/c451a3fd84b64cb19485dad758a55ebe?tpId=13&tqId=
 
 ## 树
 
-### 力扣：669修剪二叉搜索树
-* 遇到树并都是唯一的一个操作：把树所有的节点按照顺序遍历一遍；而是可能会有其他更多的操作
-> https://leetcode-cn.com/problems/trim-a-binary-search-tree/
-### 力扣：判断一颗树是不是二叉树
-
->https://leetcode-cn.com/problems/ping-heng-er-cha-shu-lcof/
-
-注意：就是一个递归的判断每个节点是不是都是平衡二叉树的过程。每个节点都是相同的。
-
-### 力扣：二叉树的深度
-
->https://leetcode-cn.com/problems/er-cha-shu-de-shen-du-lcof/
-
-### 力扣：二叉树的公共祖先
-* 使用递归或者也可以使用链表的方法来进行判断
-* **如何思考解决树的问题：**
-	* （1）遍历树的函数中有travelleft() 和travelright()，请记住每个节点都会有这两个函数，所以如何在递归中处理就是在两个函数的**前 中 后**加入相应的代码
-	* （2）无论是哪种遍历，最终都是将所有的节点无重复的遍历一遍，而并没有多余
-	* （3）关于遍历的问题：
-		* 1. 前序遍历（头 左体 右体）
-		* 2. 中序遍历（左体 头 右体）（二叉搜索树，中序遍历完之后就是有序的数组）
-		* 3. 后续遍历（左体 右体 头）
-
 
 ## 动态规划
 
