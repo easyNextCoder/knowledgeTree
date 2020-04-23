@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1988dba4-f03b-4874-bfc5-a2686cbabf3b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/hello/ApplicationSpring.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/hello/MessagePrinter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/hello/MessageService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/applicationContext.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j.properties" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="10" column="18" lean-forward="true" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="uml://MAVEN/com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT">
+          <provider selected="true" editor-type-id="UmlEditorProvider">
+            <state>
+              <ID>MAVEN</ID>
+              <OriginalElement>com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT</OriginalElement>
+              <nodes>
+                <node x="64.125" y="400.0">com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT</node>
+                <node x="88.625" y="320.0">org.springframework:spring-context:jar:4.3.13.RELEASE</node>
+                <node x="46.75" y="240.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE</node>
+                <node x="0.0" y="160.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE</node>
+                <node x="109.0" y="80.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE</node>
+                <node x="89.5" y="0.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE/commons-logging:commons-logging:jar:1.2</node>
+                <node x="130.0" y="160.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE</node>
+              </nodes>
+              <notes />
+              <edges>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+                  <point x="0.0" y="-15.0" />
+                  <point x="198.5" y="140.0" />
+                  <point x="171.5" y="140.0" />
+                  <point x="12.5" y="15.0" />
+                </edge>
+                <edge source="com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT" target="org.springframework:spring-context:jar:4.3.13.RELEASE">
+                  <point x="0.0" y="-15.0" />
+                  <point x="0.0" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+                  <point x="43.5" y="-15.0" />
+                  <point x="190.125" y="300.0" />
+                  <point x="277.5" y="300.0" />
+                  <point x="277.5" y="130.0" />
+                  <point x="196.5" y="130.0" />
+                  <point x="37.5" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE/commons-logging:commons-logging:jar:1.2">
+                  <point x="0.0" y="-15.0" />
+                  <point x="0.0" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+                  <point x="0.0" y="-15.0" />
+                  <point x="54.5" y="130.0" />
+                  <point x="121.5" y="130.0" />
+                  <point x="-37.5" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE">
+                  <point x="-24.25" y="-15.0" />
+                  <point x="71.0" y="215.0" />
+                  <point x="81.75" y="215.0" />
+                  <point x="27.25" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE">
+                  <point x="14.5" y="-15.0" />
+                  <point x="161.125" y="290.0" />
+                  <point x="198.5" y="290.0" />
+                  <point x="0.0" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE">
+                  <point x="-43.5" y="-15.0" />
+                  <point x="103.125" y="300.0" />
+                  <point x="27.25" y="300.0" />
+                  <point x="-27.25" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+                  <point x="24.25" y="-15.0" />
+                  <point x="119.5" y="140.0" />
+                  <point x="146.5" y="140.0" />
+                  <point x="-12.5" y="15.0" />
+                </edge>
+                <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE">
+                  <point x="-14.5" y="-15.0" />
+                  <point x="132.125" y="290.0" />
+                  <point x="95.25" y="290.0" />
+                  <point x="0.0" y="15.0" />
+                </edge>
+              </edges>
+              <settings layout="Hierarchic Group" zoom="0.7" x="-263.42857142857144" y="332.8571428571429" />
+              <SelectedNodes />
+              <Categories />
+              <VISIBILITY>All</VISIBILITY>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/spring02quickstart_xml.iml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="1" column="41" lean-forward="true" selection-start-line="1" selection-start-column="41" selection-end-line="1" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/hello/ApplicationSpring.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="6" column="44" lean-forward="true" selection-start-line="6" selection-start-column="44" selection-end-line="6" selection-end-column="44" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/applicationContext.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="209">
+              <caret line="11" selection-start-line="11" selection-end-line="11" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/hello/MessagePrinter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="284">
+              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+              <folding>
+                <element signature="e#236#245#0" expanded="true" />
+                <element signature="e#293#294#0" expanded="true" />
+                <element signature="e#331#332#0" expanded="true" />
+                <element signature="e#364#365#0" expanded="true" />
+                <element signature="e#425#426#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/log4j.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="6" column="54" lean-forward="true" selection-start-line="6" selection-start-column="54" selection-end-line="6" selection-end-column="54" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/hello/MessageService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="76">
+              <caret line="4" selection-start-line="4" selection-end-line="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="spring-beans.schema" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/main/java/hello/MessageService.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/applicationContext.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/hello/ApplicationSpring.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/hello/MessagePrinter.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/log4j.properties" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="683" />
+    <option name="width" value="683" />
+    <option name="height" value="728" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="hello" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="spring02quickstart_xml" type="b2602c69:ProjectViewProjectNode" />
+              <item name="spring02quickstart_xml" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1585902743599" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Desktop\KnowledgeTree\java\code\frames\spring02quickstart_xml\src\main\java\hello" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="ApplicationSpring" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="hello.ApplicationSpring" />
+      <module name="spring02quickstart_xml" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="hello.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ApplicationSpring" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1988dba4-f03b-4874-bfc5-a2686cbabf3b" name="Default Changelist" comment="" />
+      <created>1585891842329</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1585891842329</updated>
+      <workItem from="1585891848441" duration="7195000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="7195000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="683" y="0" width="683" height="728" extended-state="0" />
+    <layout>
+      <window_info id="Designer" order="0" />
+      <window_info id="UI Designer" order="1" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info id="Image Layers" order="4" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.43820226" />
+      <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Messages" weight="0.3289689" />
+      <window_info anchor="bottom" id="Version Control" order="0" />
+      <window_info anchor="bottom" id="Spring" order="1" />
+      <window_info anchor="bottom" id="Terminal" order="2" />
+      <window_info anchor="bottom" id="Database Changes" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="4" side_tool="true" />
+      <window_info anchor="bottom" id="Docker" order="5" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Message" order="6" />
+      <window_info anchor="bottom" id="Find" order="7" />
+      <window_info anchor="bottom" id="Run" order="8" weight="0.3289689" />
+      <window_info anchor="bottom" id="Debug" order="9" weight="0.41008404" />
+      <window_info anchor="bottom" id="Cvs" order="10" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="11" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="12" />
+      <window_info anchor="right" id="Theme Preview" order="0" />
+      <window_info anchor="right" id="Capture Analysis" order="1" />
+      <window_info anchor="right" id="Palette&#9;" order="2" />
+      <window_info anchor="right" id="Maven" order="3" />
+      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Palette" order="5" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="6" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="7" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="8" weight="0.25" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/java/hello/MessageService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="76">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/hello/MessagePrinter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="e#236#245#0" expanded="true" />
+            <element signature="e#293#294#0" expanded="true" />
+            <element signature="e#331#332#0" expanded="true" />
+            <element signature="e#364#365#0" expanded="true" />
+            <element signature="e#425#426#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/applicationContext.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" selection-start-line="11" selection-end-line="11" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://MAVEN/com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>MAVEN</ID>
+          <OriginalElement>com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT</OriginalElement>
+          <nodes>
+            <node x="64.125" y="400.0">com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT</node>
+            <node x="88.625" y="320.0">org.springframework:spring-context:jar:4.3.13.RELEASE</node>
+            <node x="46.75" y="240.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE</node>
+            <node x="0.0" y="160.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE</node>
+            <node x="109.0" y="80.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE</node>
+            <node x="89.5" y="0.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE/commons-logging:commons-logging:jar:1.2</node>
+            <node x="130.0" y="160.0">org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+              <point x="0.0" y="-15.0" />
+              <point x="198.5" y="140.0" />
+              <point x="171.5" y="140.0" />
+              <point x="12.5" y="15.0" />
+            </edge>
+            <edge source="com.qfedu:spring02quickstart_xml:1.0-SNAPSHOT" target="org.springframework:spring-context:jar:4.3.13.RELEASE">
+              <point x="0.0" y="-15.0" />
+              <point x="0.0" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+              <point x="43.5" y="-15.0" />
+              <point x="190.125" y="300.0" />
+              <point x="277.5" y="300.0" />
+              <point x="277.5" y="130.0" />
+              <point x="196.5" y="130.0" />
+              <point x="37.5" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE/commons-logging:commons-logging:jar:1.2">
+              <point x="0.0" y="-15.0" />
+              <point x="0.0" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+              <point x="0.0" y="-15.0" />
+              <point x="54.5" y="130.0" />
+              <point x="121.5" y="130.0" />
+              <point x="-37.5" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE">
+              <point x="-24.25" y="-15.0" />
+              <point x="71.0" y="215.0" />
+              <point x="81.75" y="215.0" />
+              <point x="27.25" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-expression:jar:4.3.13.RELEASE">
+              <point x="14.5" y="-15.0" />
+              <point x="161.125" y="290.0" />
+              <point x="198.5" y="290.0" />
+              <point x="0.0" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-beans:jar:4.3.13.RELEASE">
+              <point x="-43.5" y="-15.0" />
+              <point x="103.125" y="300.0" />
+              <point x="27.25" y="300.0" />
+              <point x="-27.25" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-core:jar:4.3.13.RELEASE">
+              <point x="24.25" y="-15.0" />
+              <point x="119.5" y="140.0" />
+              <point x="146.5" y="140.0" />
+              <point x="-12.5" y="15.0" />
+            </edge>
+            <edge source="org.springframework:spring-context:jar:4.3.13.RELEASE" target="org.springframework:spring-context:jar:4.3.13.RELEASE/org.springframework:spring-aop:jar:4.3.13.RELEASE">
+              <point x="-14.5" y="-15.0" />
+              <point x="132.125" y="290.0" />
+              <point x="95.25" y="290.0" />
+              <point x="0.0" y="15.0" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="0.7" x="-263.42857142857144" y="332.8571428571429" />
+          <SelectedNodes />
+          <Categories />
+          <VISIBILITY>All</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spring02quickstart_xml.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="41" lean-forward="true" selection-start-line="1" selection-start-column="41" selection-end-line="1" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="10" column="18" lean-forward="true" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/hello/ApplicationSpring.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="44" lean-forward="true" selection-start-line="6" selection-start-column="44" selection-end-line="6" selection-end-column="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/log4j.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="54" lean-forward="true" selection-start-line="6" selection-start-column="54" selection-end-line="6" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
