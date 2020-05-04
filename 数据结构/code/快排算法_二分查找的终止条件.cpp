@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <functional>
 
 using namespace std;
 //注意默写一下quick_sort和binary search
@@ -40,7 +42,7 @@ void quick_sort(vector<int>&vec, int first, int last){
 	int provit = get_provit(vec, first, last);
 	swap(vec[(first+last)/2], vec[last-1]);
 	int i = first;
-	int j = last - 2;
+	int j = last - 1;
 	for(;;){
 		while(vec[++i]<provit){}
 		while(vec[--j]>provit){}
@@ -56,7 +58,7 @@ void quick_sort(vector<int>&vec, int first, int last){
 	quick_sort(vec, i+1, last);
 }
 
-int binary_search(vector<int>&vec, int target){
+int binarySearch(vector<int>&vec, int target){
 	int i = 0, j = vec.size() - 1;
 	int mid = -1;
 	while(i<=j){
@@ -79,7 +81,18 @@ int main(){
 	for (auto item : vec)
         cout << item << endl;
         
-    int index = binary_search(vec, 67);
+    int index = binarySearch(vec, 67);
     cout<<"the index is: "<<index<<endl;
+    
+    vector<int> vec1 = {6,5,4,3,2,1};
+    /*
+    int index1 = binary_search(vec1.begin(), vec1.end(), 5, [](const int& a, const int& b)->bool{
+    	return a>b;
+	});
+	*/
+	
+	int index1 = binary_search(vec1.begin(), vec1.end(), 5, greater<int>());
+	
+    cout<<index1<<endl;
 	return 0;
 }
