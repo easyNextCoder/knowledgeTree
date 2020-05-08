@@ -1,0 +1,38 @@
+面试题 05.03. 翻转数位
+
+https://leetcode-cn.com/problems/reverse-bits-lcci/
+
+给定一个32位整数 num，你可以将一个数位从0变为1。请编写一个程序，找出你能够获得的最长的一串1的长度。
+
+示例 1：
+
+输入: num = 1775(110111011112)
+输出: 8
+示例 2：
+
+输入: num = 7(01112)
+输出: 4
+
+来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/reverse-bits-lcci
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+
+抄的代码：
+	int pre = 0;
+        int cur = 0;
+        int result = 0;
+        for(int i = 0; i<32; i++)
+        {
+            if(ns[i] == '1')
+            {
+                cur++;
+            }else{
+                result = max(result, pre+cur);
+                pre = cur+1;
+                cur = 0;
+            }
+        }
+        result = max(result, pre+cur);
+        return result;
+
+* 自己写的逻辑复杂的原因是：每次都在按11101110这样的模式来匹配，这样无疑增加了更多的判断和更多的逻辑条件，上面自己看的别人的代码处理就是无论是1110这个0，还是11101110中最后的那个0都按照一种模式来处理。
