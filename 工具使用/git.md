@@ -34,3 +34,26 @@
 * 注意点：
 
 commit和commit && push之间的区别是什么？
+
+## git命令
+
+git add .
+
+git commit -m ""(windows下是单引号)
+
+git checkout -b mybranch
+
+删除分支： $ git branch -d mybranch
+强制删除分支： $ git branch -D mybranch
+列出所有分支： $ git branch
+
+更新远程库到本地： $ git fetch origin
+推送分支： $ git push origin mybranch
+取远程分支合并到本地： $ git merge origin/mybranch
+取远程分支并分化一个新分支： $ git checkout -b mybranch origin/mybranch
+
+更新master主线上的东西到该分支上：$git rebase master
+
+切换到master分支：$git checkout master
+
+>https://blog.csdn.net/carolzhang8406/article/details/49757101
