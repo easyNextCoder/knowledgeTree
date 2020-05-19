@@ -1,0 +1,91 @@
+* 二分搜索对一个有重复元素的数组进行搜索
+* 二分搜索在搜索递增序列的时候，迭代条件应该是:left = left+(right-left)/2;
+* 二分搜索在搜索递减序列的时候，迭代条件应该是：left = left+(right-left+1)/2想想为什么？
+* 终止条件和更新迭代区间代码的配合:
+	while(left<right)  应该与  left = mid; right = mid配合使用
+	while(left<=right) 应该与  left = mid + 1; right = mid-1配合使用
+
+
+
+以下是力扣：全局倒置和局部倒置题
+// 全局倒置与局部倒置.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+//
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    int searchFirstLess(int target, vector<int>& dp, int first, int last)
+    {
+        int left = first;
+        int right = last;
+        int mid = first + (last - first+1) / 2;
+        //而分搜索只适合找不能重复的元素吗？
+        cout << target << endl;
+        while (left <= right)
+        {
+            cout << left << ":" << right << endl;
+            mid = left + (right - left+1) / 2;//在这个里面+1代表，当还有两个元素的时候，mid始终是第二个元素，不加1则始终是第一个元素
+            if (dp[mid] > target)
+            {
+                left = mid;
+            }
+            else if (dp[mid] < target)
+            {
+                right = mid;
+            }
+            else {
+                ;
+            }
+        }
+        return left + 1;
+    }
+    bool isIdealPermutation(vector<int>& A) {
+        int globalR = 0;
+        int localR = 0;
+        vector<int>dp(A.size());
+        dp[A.size() - 1] = A[A.size() - 1];//dp保存着当前及当前位置之后的最大值
+        int tmp_max = dp.back();
+        for (int i = A.size() - 1; i >= 0; i--)
+        {
+            if (tmp_max > A[i])
+            {
+                dp[i] = tmp_max;
+            }
+            else {
+                tmp_max = A[i];
+                dp[i] = tmp_max;
+            }
+            cout << dp[i] << "-";
+        }
+        cout << endl;
+
+        for (int i = 0; i < A.size() - 1; i++)
+        {
+            int index = searchFirstLess(A[i], dp, i + 1, A.size()-1);
+            globalR += A.size() - index + 1;
+        }
+
+        for (int j = 0; j < A.size() - 1; j++)
+        {
+            if (A[j] > A[j + 1])
+                localR++;
+        }
+
+        return globalR == localR;
+
+    }
+};
+
+
+int main()
+{
+    Solution solution;
+    vector<int> vec = { 1,0,2 };
+    solution.isIdealPermutation(vec);
+    std::cout << "Hello World!\n";
+}
+//以上代码，并不能正确解题，但是其中二分法搜索一个从大到小排列的一个数组的代码没有+1导致出现bug
