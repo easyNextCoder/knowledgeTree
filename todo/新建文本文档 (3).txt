@@ -1,0 +1,8 @@
+--- "a/数据结构/分治思想.md"
++++ /dev/null
+@@ -1,5 +0,0 @@
+-## 最小的k个数
+-题目：https://leetcode-cn.com/problems/smallest-k-lcci/solution/gao-gao-kuai-pai-by-wangyunpan/
+-解题思路：
+-最小堆（问题：原地建堆，O(NlogK)）
+-快排法进行分治

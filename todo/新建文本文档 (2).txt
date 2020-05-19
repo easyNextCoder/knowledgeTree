@@ -1,0 +1,2 @@
+# Read from the file file.txt and print its transposed content to stdout.
+cat file.txt| awk 'BEGIN{v=1; k=0}{dic[k++]=$2;printf $1; printf " "}END{printf "\n"; for(i = 0;i<NR;i++){printf dic[i];printf " "}printf "\n";}'
