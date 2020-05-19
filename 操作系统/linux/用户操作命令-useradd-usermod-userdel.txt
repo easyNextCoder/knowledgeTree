@@ -1,0 +1,31 @@
+users
+
+useradd
+功能：新建用户账号
+格式：useradd 参数 用户名
+-d 指定用户登入时的主目录
+-e 账户终止日期
+-g 指定账户所属的用户组
+-u 指定用户ID号
+例子：
+useradd -g net04 zhangshan
+新建一个用户并将其添加到net04组
+
+usermod
+功能：修改用户的属性（超级用户可用）
+格式：usermod  参数 用户名
+-d 指定用户登入时的主目录
+-e 账户终止日期
+-g 如上
+-u 指定用户ID号
+-I 新用户名
+示例：
+usermod -u 1000  xuyongkang
+将xuyongkang这个用户的uid改为1000
+
+userdel
+功能：删除指定的用户账户（超级用户可用）
+格式：userdel 参数 用户名
+-r  
+-f
+常用就是上面的这两个

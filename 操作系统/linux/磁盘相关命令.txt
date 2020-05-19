@@ -1,0 +1,6 @@
+lsblk  列出计算机中磁盘情况
+mount ./dev/sdb ./media  将磁盘./dev/sdb挂载到 ./media文件夹下使用
+umount ./media  将U盘/磁盘（文件系统）卸载
+	umount /media
+	umount /dev/cdrom
+	umount /dev/cdrom/mnt这三个命令都可以

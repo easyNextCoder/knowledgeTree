@@ -1,0 +1,408 @@
+
+<!-- saved from url=(0070)http://www.delorie.com/djgpp/doc/brennan/brennan_att_inline_djgpp.html -->
+<html class=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Inline Assembly with DJGPP</title>
+<link type="text/css" rel="stylesheet" charset="UTF-8" href="./Inline Assembly with DJGPP_files/translateelement.css"></head><body>
+<center><h1>Brennan's Guide to Inline Assembly</h1>
+<h3>by Brennan "Bas" Underwood</h3>
+</center>
+Document version 1.1.2.2
+<p>
+Ok. This is meant to be an introduction to inline assembly under DJGPP.
+DJGPP is based on GCC, so it uses the AT&amp;T/UNIX syntax and has a somewhat
+unique method of inline assembly. I spent many hours figuring some of
+this stuff out and told <b>Info</b> that I hate it, many times.</p><p>
+Hopefully if you already know Intel syntax, the examples will be helpful
+to you. I've put variable names, register names and other literals in
+<b>bold type</b>.
+</p><p>
+</p><center><h2>The Syntax</h2></center>
+So, DJGPP uses the AT&amp;T assembly syntax. What does that mean to you?
+<ul>
+<li><b>Register naming:</b><br>
+Register names are prefixed with "%".
+To reference <b>eax</b>:
+<pre><b>AT&amp;T:</b>  %eax
+<b>Intel:</b> eax
+</pre>
+</li><li><b>Source/Destination Ordering:</b><br>
+In AT&amp;T syntax (which is the UNIX standard, BTW) the source is <em>always</em>
+on the <strong>left</strong>, and the destination is <em>always</em>
+on the <strong>right</strong>.<br>
+So let's load <b>ebx</b> with the value in <b>eax</b>:
+<pre><b>AT&amp;T:</b>  movl %eax, %ebx
+<b>Intel:</b> mov ebx, eax
+</pre>
+</li><li><b>Constant value/immediate value format:</b><br>
+You must prefix all constant/immediate values with "$".<br>
+Let's load <b>eax</b> with the address of the "C" variable <b>booga</b>,
+which is static.
+<pre><b>AT&amp;T:</b>  movl $_booga, %eax
+<b>Intel:</b> mov eax, _booga
+</pre>
+Now let's load <b>ebx</b> with <b>0xd00d</b>:
+<pre><b>AT&amp;T:</b>  movl $0xd00d, %ebx
+<b>Intel:</b> mov ebx, d00dh
+</pre>
+</li><li><b>Operator size specification:</b><br>
+You must suffix the instruction with one of <b>b</b>, <b>w</b>, or <b>l</b>
+to specify the width of the destination register as a <b>byte</b>, <b>word</b>
+or <b>longword</b>. If you omit this, GAS (GNU assembler) will attempt to
+guess. <em>You don't want GAS to guess, and guess wrong!</em> Don't forget it.
+<pre><b>AT&amp;T:</b>  movw %ax, %bx
+<b>Intel:</b> mov bx, ax
+</pre>
+The equivalent forms for Intel is <b>byte ptr</b>, <b>word ptr</b>, and
+<b>dword ptr</b>, but that is for when you are...
+</li><li><b>Referencing memory:</b><br>
+DJGPP uses 386-protected mode, so you can forget all that real-mode addressing
+junk, including the restrictions on which register has what default segment,
+which registers can be base or index pointers. Now, we just get 6 general
+purpose registers. (7 if you use <b>ebp</b>, but be sure to restore it
+yourself or compile with <b>-fomit-frame-pointer</b>.)<br>
+Here is the canonical format for 32-bit addressing:
+<pre><b>AT&amp;T:</b>  immed32(basepointer,indexpointer,indexscale)
+<b>Intel:</b> [basepointer + indexpointer*indexscale + immed32]
+</pre>
+You could think of the formula to calculate the address as:
+<pre>  immed32 + basepointer + indexpointer * indexscale
+</pre>
+You don't have to use all those fields, but you <i>do</i> have to have
+at least 1 of immed32, basepointer and you <em>MUST</em>
+add the size suffix to the operator!<br>
+Let's see some simple forms of memory addressing:<p>
+</p><ul>
+<li>Addressing a particular C variable:<br>
+<pre><b>AT&amp;T:</b>  _booga
+<b>Intel:</b> [_booga]
+</pre>
+Note: the underscore ("_") is how you get at static (global) C variables
+from assembler. <em>This only works with global variables</em>. Otherwise,
+you can use extended asm to have variables preloaded into registers
+for you. I address that farther down.<p>
+</p></li><li>Addressing what a register points to:<br>
+<pre><b>AT&amp;T:</b>  (%eax)
+<b>Intel:</b> [eax]
+</pre>
+<br>
+</li><li>Addressing a variable offset by a value in a register:<br>
+<pre><b>AT&amp;T:</b> _variable(%eax)
+<b>Intel:</b> [eax + _variable]
+</pre>
+<br>
+</li><li>Addressing a value in an array of integers (scaling up by 4):<br>
+<pre><b>AT&amp;T:</b>  _array(,%eax,4)
+<b>Intel:</b> [eax*4 + array]
+</pre>
+<br>
+</li><li>You can also do offsets with the immediate value:<br>
+<pre><b>C code:</b> *(p+1) where p is a char *
+<b>AT&amp;T:</b>  1(%eax) where eax has the value of p
+<b>Intel:</b> [eax + 1]
+</pre>
+<br>
+</li><li>You can do some simple math on the immediate value:<br>
+<pre><b>AT&amp;T:</b> _struct_pointer+8
+</pre>
+I assume you can do that with Intel format as well.<p>
+</p></li><li>Addressing a particular char in an array of 8-character records:<br>
+<b>eax</b> holds the number of the record desired. <b>ebx</b> has the wanted
+char's offset within the record.<br>
+<pre><b>AT&amp;T:</b>  _array(%ebx,%eax,8)
+<b>Intel:</b> [ebx + eax*8 + _array]
+</pre>
+</li></ul>
+Whew. Hopefully that covers all the addressing you'll need to do. As a note,
+you can put <b>esp</b> into the address, but only as the base register.
+</li></ul>
+<center><h2>Basic inline assembly</h2></center>
+The format for basic inline assembly is very simple, and much like Borland's
+method.
+<pre>asm ("statements");
+</pre>
+Pretty simple, no?
+So
+<pre>asm ("nop");
+</pre>
+will do nothing of course, and
+<pre>asm ("cli");
+</pre>
+will stop interrupts, with
+<pre>asm ("sti");
+</pre>
+of course enabling them. You can use <b>__asm__</b> instead of <b>asm</b>
+if the keyword <b>asm</b> conflicts with something in your program.
+<p>
+When it comes to simple stuff like this, basic inline assembly is fine. You
+can even push your registers onto the stack, use them, and put them
+back.
+</p><pre>asm ("pushl %eax\n\t"
+     "movl $0, %eax\n\t"
+     "popl %eax");
+</pre>
+(The \n's and \t's are there so the <b>.s</b> file that GCC generates and hands
+to GAS comes out right when you've got multiple statements per <b>asm</b>.)<br>
+It's really meant for issuing instructions for which there is no
+equivalent in C and don't touch the registers.<p>
+But if you <i>do</i> touch the registers, and don't fix things at the end of
+your <b>asm</b> statement, like so:
+</p><pre>asm ("movl %eax, %ebx");
+asm ("xorl %ebx, %edx");
+asm ("movl $0, _booga");
+</pre>
+then your program will probably blow things to hell. This is
+because GCC hasn't been told that your <b>asm</b> statement clobbered
+<b>ebx</b> and <b>edx</b> and <b>booga</b>, which it might have been
+keeping in a register, and might plan on using later.
+For that, you need:
+<center><h2>Extended inline assembly</h2></center>
+The basic format of the inline assembly stays much the same, but now gets
+Watcom-like extensions to allow input arguments and output arguments.
+<p>
+Here is the basic format:
+</p><pre>asm ( "statements" : output_registers : input_registers : clobbered_registers);
+</pre>
+Let's just jump straight to a nifty example, which I'll then explain:<br>
+<pre>asm ("cld\n\t"
+     "rep\n\t"
+     "stosl"
+     : /* no output registers */
+     : "c" (count), "a" (fill_value), "D" (dest)
+     : "%ecx", "%edi" );
+</pre>
+
+The above stores the value in <b>fill_value</b> <b>count</b> times to the
+pointer <b>dest</b>.
+<p>
+Let's look at this bit by bit.
+</p><pre>asm ("cld\n\t"
+</pre>
+We are clearing the direction bit of the <b>flags</b> register.
+You never know what this is going to be left at,
+and it costs you all of 1 or 2 cycles.
+<pre>     "rep\n\t"
+     "stosl"
+</pre>
+Notice that GAS requires the <b>rep</b> prefix to occupy a line of it's own.
+Notice also that <b>stos</b> has the <b>l</b> suffix to make it move
+<b>longwords</b>.
+<pre>     : /* no output registers */
+</pre>
+Well, there aren't any in this function.
+<pre>     : "c" (count), "a" (fill_value), "D" (dest)
+</pre>
+Here we load <b>ecx</b> with <b>count</b>, <b>eax</b> with <b>fill_value</b>,
+and <b>edi</b> with <b>dest</b>. Why make
+GCC do it instead of doing it ourselves? Because GCC, in its register
+allocating, might be able to arrange for, say, <b>fill_value</b> to already
+be in <b>eax</b>. If this is in a loop, it might be able to preserve
+<b>eax</b> thru the loop, and save a <b>movl</b> once per loop.
+<pre>     : "%ecx", "%edi" );
+</pre>
+And here's where we specify to GCC, "you can no longer count on the values
+you loaded into <b>ecx</b> or <b>edi</b> to be valid." This doesn't mean they
+will be reloaded for certain. This is the clobberlist.
+<p>
+Seem funky? Well, it really helps when optimizing, when GCC can know exactly
+what you're doing with the registers before and after. It folds your
+assembly code into the code it's generates (whose rules for generation
+look <em>remarkably</em> like the above) and then optimizes. It's even
+smart enough to know that if you tell it to put (x+1) in a register, then
+if you don't clobber it, and later C code refers to (x+1), and it was
+able to keep that register free, it will reuse the computation. Whew.
+</p><p>
+Here's the list of register loading codes that you'll be likely to use:
+</p><pre>a        eax
+b        ebx
+c        ecx
+d        edx
+S        esi
+D        edi
+I        constant value (0 to 31)
+q,r      dynamically allocated register (see below)
+g        eax, ebx, ecx, edx or variable in memory
+A        eax and edx combined into a 64-bit integer (use long longs)
+</pre>
+Note that you can't directly refer to the byte registers (<b>ah</b>, <b>al</b>,
+etc.) or the word registers (<b>ax</b>, <b>bx</b>, etc.) when you're loading this
+way. Once you've got it in there, though, you can specify <b>ax</b> or whatever
+all you like.
+<p>
+The codes <em>have</em> to be in quotes, and the expressions to load in
+<em>have</em> to be in parentheses.
+</p><p>
+When you do the clobber list, you specify the registers as above <em>with</em>
+the <b>%</b>. If you write to a variable, you <em>must</em> include
+<b>"memory"</b> as one of The Clobbered. This is in case you wrote to a variable
+that GCC thought it had in a register. This is the same as clobbering
+all registers. While I've never run into a problem with it, you might also
+want to add <b>"cc"</b> as a clobber if you change the condition codes (the bits
+in the <b>flags</b> register the <b>jnz</b>, <b>je</b>, etc. operators look at.)
+</p><p>
+Now, that's all fine and good for loading specific registers. But what if
+you specify, say, <b>ebx</b>, and <b>ecx</b>, and GCC can't arrange for the
+values to be in those registers without having to stash the previous values.
+It's possible to let GCC pick the register(s). You do this:
+</p><pre>asm ("leal (%1,%1,4), %0"
+     : "=r" (x)
+     : "0" (x) );
+</pre>
+The above example multiplies x by 5 really quickly (1 cycle on the Pentium).
+Now, we could have specified, say <b>eax</b>. But unless we really need a
+specific register (like when using <b>rep movsl</b> or <b>rep stosl</b>, which
+are hardcoded to use <b>ecx</b>, <b>edi</b>, and <b>esi</b>), why not let GCC
+pick an available one? So when GCC generates the
+output code for GAS, %0 will be replaced by the register it picked.
+<p>
+And where did <b>"q"</b> and <b>"r"</b> come from? Well, <b>"q"</b> causes
+GCC to allocate from <b>eax</b>, <b>ebx</b>, <b>ecx</b>, and <b>edx</b>.
+<b>"r"</b> lets GCC also consider <b>esi</b> and <b>edi</b>.
+So make sure, if you use <b>"r"</b> that it would be possible to use <b>esi</b>
+or <b>edi</b> in that instruction. If not, use <b>"q"</b>.
+</p><p>
+Now, you might wonder, how to determine how the <b>%n</b> tokens get
+allocated to the arguments. It's a straightforward first-come-first-served,
+left-to-right thing, mapping to the <b>"q"</b>'s and <b>"r"</b>'s.  But if you
+want to reuse a register allocated with a <b>"q"</b> or <b>"r"</b>, you use
+<b>"0"</b>, <b>"1"</b>, <b>"2"</b>... etc.
+</p><p>
+You don't need to put a GCC-allocated register on the clobberlist
+as GCC knows that you're messing with it.
+</p><p>
+Now for output registers.
+</p><pre>asm ("leal (%1,%1,4), %0"
+     : "=r" (x_times_5)
+     : "r" (x) );
+</pre>
+Note the use of <b>=</b> to specify an output register. You just have to
+do it that way. If you want 1 variable to stay in 1 register for both
+in and out, you have to respecify the register allocated to it on the
+way in with the <b>"0"</b> type codes as mentioned above.
+<pre>asm ("leal (%0,%0,4), %0"
+     : "=r" (x)
+     : "0" (x) );
+</pre>
+This also works, by the way:
+<pre>asm ("leal (%%ebx,%%ebx,4), %%ebx"
+     : "=b" (x)
+     : "b" (x) );
+</pre>
+2 things here:
+<ul>
+<li>Note that we don't have to put <b>ebx</b> on the clobberlist, GCC knows it
+goes into x. Therefore, since it can know the value of <b>ebx</b>,
+it isn't considered clobbered.
+</li><li>Notice that in extended asm, you must prefix registers with <b>%%</b>
+instead of just <b>%</b>. Why, you ask? Because as GCC parses along for
+%0's and %1's and so on, it would interpret %edx as a %e parameter, see
+that that's non-existent, and ignore it. Then it would bitch about finding
+a symbol named dx, which isn't valid because it's not prefixed with <b>%</b>
+and it's not the one you meant anyway.
+</li></ul>
+<strong>Important note:</strong> If your assembly statement <em>must</em>
+execute where you put it, (i.e. must not be moved out of a loop as an
+optimization), put the keyword <b>volatile</b> after <b>asm</b>
+and before the ()'s. To be ultra-careful, use
+<pre>__asm__ __volatile__ (...whatever...);
+</pre>
+However, I would like to point out that if your assembly's only
+purpose is to calculate the output registers, with no other side effects,
+you should leave off the <b>volatile</b> keyword so your statement
+will be processed into GCC's common subexpression elimination optimization.
+<center><h2>Some useful examples</h2></center>
+<pre>#define disable() __asm__ __volatile__ ("cli");
+
+#define enable() __asm__ __volatile__ ("sti");
+</pre>
+Of course, <b>libc</b> has these defined too.
+<pre>#define times3(arg1, arg2) \
+__asm__ ( \
+  "leal (%0,%0,2),%0" \
+  : "=r" (arg2) \
+  : "0" (arg1) );
+
+#define times5(arg1, arg2) \
+__asm__ ( \
+  "leal (%0,%0,4),%0" \
+  : "=r" (arg2) \
+  : "0" (arg1) );
+
+#define times9(arg1, arg2) \
+__asm__ ( \
+  "leal (%0,%0,8),%0" \
+  : "=r" (arg2) \
+  : "0" (arg1) );
+</pre>
+These multiply arg1 by 3, 5, or 9 and put them in arg2. You should be ok
+to do:
+<pre>times5(x,x);
+</pre>
+as well.
+<pre>#define rep_movsl(src, dest, numwords) \
+__asm__ __volatile__ ( \
+  "cld\n\t" \
+  "rep\n\t" \
+  "movsl" \
+  : : "S" (src), "D" (dest), "c" (numwords) \
+  : "%ecx", "%esi", "%edi" )
+</pre>
+Helpful Hint: If you say <b>memcpy()</b> with a constant length parameter, GCC
+will inline it to a <b>rep movsl</b> like above. But if you need a variable
+length version that inlines and you're always moving dwords, there ya go.
+<pre>#define rep_stosl(value, dest, numwords) \
+__asm__ __volatile__ ( \
+  "cld\n\t" \
+  "rep\n\t" \
+  "stosl" \
+  : : "a" (value), "D" (dest), "c" (numwords) \
+  : "%ecx", "%edi" )
+</pre>
+Same as above but for <b>memset()</b>, which doesn't get inlined no matter
+what (for now.)
+<p>
+</p><pre>#define RDTSC(llptr) ({ \
+__asm__ __volatile__ ( \
+        ".byte 0x0f; .byte 0x31" \
+        : "=A" (llptr) \
+        : : "eax", "edx"); })
+</pre>
+Reads the TimeStampCounter on the Pentium and puts the 64 bit result into llptr.
+<p>
+</p><center><h2>The End</h2></center>
+"The End"?! Yah, I guess so.
+<p>
+If you're wondering, I personally am a big fan of AT&amp;T/UNIX syntax now.
+(It might have helped that I cut my teeth on SPARC assembly. Of course,
+that machine actually had a decent number of general registers.)
+It might seem weird to you at first, but it's really more logical than
+Intel format, and has no ambiguities.
+</p><p>
+If I still haven't answered a question of yours, look in the <b>Info</b>
+pages for more information, particularly on the input/output registers.
+You can do some funky stuff like use <b>"A"</b> to allocate two registers
+at once for 64-bit math
+or <b>"m"</b> for static
+memory locations, and a bunch more that aren't really used as much as
+<b>"q"</b> and <b>"r"</b>.
+</p><p>
+Alternately, <a href="mailto:brennan@rt66.com">mail me</a>, and I'll
+see what I can do. (If you find any errors in the above, <em>please</em>,
+e-mail me and tell me about it! It's frustrating enough to learn without
+buggy docs!) Or heck, mail me to say "boogabooga."
+</p><p>
+It's the least you can do.
+</p><p>
+</p><hr>
+<h3>Related Usenet posts:</h3>
+<ul>
+<li> <a href="http://www.delorie.com/djgpp/doc/brennan/local_labels.html">local labels</a>
+</li><li> <a href="http://www.delorie.com/djgpp/doc/brennan/fixmul.html">fixed point multiplies</a>
+</li></ul>
+<hr>
+<i>Thanks to Eric J. Korpela &lt;korpela@ssl.Berkeley.EDU&gt; for some corrections.</i>
+<hr>
+<b>Have you seen the <a href="http://www.delorie.com/djgpp/doc/brennan/index.html">DJGPP2+Games Page</a>? Probably.<br>
+Page written and provided by <a href="http://www.rt66.com/~brennan/">Brennan Underwood</a>.<br>
+Copyright © 1996 Brennan Underwood. Share and enjoy!<br>
+</b>Page created with <i>vi</i>, God's own editor. 
+<img src="./Inline Assembly with DJGPP_files/countess.xbm" align="absmiddle" alt=""><div id="goog-gt-tt" class="skiptranslate" dir="ltr"><div style="padding: 8px;"><div><div class="logo"><img src="./Inline Assembly with DJGPP_files/translate_24dp.png" width="20" height="20" alt="Google 翻译"></div></div></div><div class="top" style="padding: 8px; float: left; width: 100%;"><h1 class="title gray">原文</h1></div><div class="middle" style="padding: 8px;"><div class="original-text"></div></div><div class="bottom" style="padding: 8px;"><div class="activity-links"><span class="activity-link">提供更好的翻译建议</span><span class="activity-link"></span></div><div class="started-activity-container"><hr style="color: #CCC; background-color: #CCC; height: 1px; border: none;"><div class="activity-root"></div></div></div><div class="status-message" style="display: none;"></div></div>
+<div class="goog-te-spinner-pos"><div class="goog-te-spinner-animation"><svg xmlns="http://www.w3.org/2000/svg" class="goog-te-spinner" width="96px" height="96px" viewBox="0 0 66 66"><circle class="goog-te-spinner-path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle></svg></div></div></body></html>

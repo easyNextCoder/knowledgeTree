@@ -1,0 +1,3 @@
+find / -name "*.h" | awk 'BEGIN{}{printf "grep -E \".*sock.*stream.*\"" $1; printf "\n"; printf "echo " $1;printf "\n"}'|sh
+
+搜索指定类型的文件，再grep字符，并显示

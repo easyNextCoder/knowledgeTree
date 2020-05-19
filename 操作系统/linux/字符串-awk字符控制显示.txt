@@ -1,0 +1,6 @@
+awk '{print $2 $1}'   打印出来第二列和第一列的功能
+awk 'NR==10{print $0}' file.txt   打印出文本中的第10行内容
+
+	NF代表的是一个文本文件中一行（一条记录）中的字段个数，NR代表的是这个文本文件的行数（记录数）
+	September 2003            # NR=1;NF=2
+	Su Mo Tu We Th Fr Sa         # NR=2;NF=7

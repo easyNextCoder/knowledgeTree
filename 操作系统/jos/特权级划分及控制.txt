@@ -1,0 +1,20 @@
+DPL(Descriptor privilege level)规定了访问该段的最低的权限级别，规定的是某个段或者门的特权级别，当当前执行的代码段试图访问某个段或者门的时候，将该段或门的DPL与该段或门选择器的CPL和RPL进行比较。
+
+CPL(Current Privilege level）在 CPU 中运行的是指令，其运行过程中的指令总会属于某个代码段，该代码段的特权级，也就是代码段描述符中的 DPL，便是当前 CPU 所处的特权级，这个特权级称为当前特权级，即 CPL(Current Privilege Level)。
+
+也就是说当前你的正在运行的代码所在代码段的段描述符中的DPL等于CPL也等于CS.RPL
+
+RPL(Request Privilege level）当前段发出的段访问的选择子的优先级（只能大于或者等于当前进程的CPL，当大于当前代码段的CPL的时候，说明当前进程要以更低的优先级去访问即将要被访问的段，这个RPL可以自己设置，不过当小于CPL时，我们最终还是只能以CPL的优先级进行访问）
+
+IOPL：输入输出特权级别
+在保护模式中，对I/O的控制权限也做了限制。用户进程如果不被允许是无法进行I/O操作的。这种限制有两种方法实现，它们就是IOPL和I/O许可位图。 IOPL是I/O保护机制中的关键之一，它位于EFLAGS寄存器的第12、13位。指令in、ins、out、outs、cli、sti只有在CPL<= IOPL时才能执行。这些指令被称为I/O敏感指令，如果特权级低的指令视图访问这些I/O敏感指令将会导致常规保护错误(#GP)。可以改变IOPL的指令只有popfl和iret指令，但只有运行在特权级0的程序才能将其改变。
+> http://way4ever.com/?p=81
+
+int call 等一些指令能够改变程序执行流的指令，这样就使得CS和EIP的值发生改变，从而使处理器执行到了不同特权级的代码，不过这些转移指令，意味着特权可能发生变化，所以这些指令不能随便发生，要经过处理器的CPL DPL RPL特权级的检查，合格之后才能够转移。
+
+为什么要CPL和RPL进行来进行特权级访问控制？
+答：最终要揪出，发出访问请求背后那个人的特权级！
+
+> https://blog.csdn.net/qq_37414405/article/details/84535145?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3
+图片表示的比较详细
+

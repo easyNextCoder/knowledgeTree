@@ -1,0 +1,24 @@
+File system preliminaries
+
+我们将要实现的文件系统会比真正的文件系统要简单，只能满足基本的创建读写删操作，不支持链接，符号链接，时间戳等特性。
+
+JOS文件系统不使用inodes，所有文件的元数据都被存储在directory entry中。文件和目录逻辑都是由一系列的数据blocks组成，这些blocks分散在磁盘中，文件系统屏蔽blocks分布的细节。jos文件系统允许用户读目录元数据，这就意味着用户可以扫描目录来实现像ls这样的命令。
+
+大部分磁盘都是以sector(512字节)为粒度进行读写的,文件系统以block为单位分配和使用磁盘。sector size是磁盘的属性，block size是操作系统使用磁盘的粒度。JOS的文件系统的block size被定为4096字节。
+
+
+第0个扇区放的是boot当中的内容
+从第1个扇区开始存放文件索引，超级快，bitmap等
+
+再将当前支持的磁盘大小，映射到fs文件进程中，当访问文件进程的特定位置的时候就
+出发中断从磁盘中读取文件到内存中。
+
+
+
+Block Cache
+
+我们的文件系统最大支持3GB，文件系统进程保留从0x10000000 (DISKMAP)到0xD0000000 (DISKMAP+DISKMAX)固定3GB的内存空间作为磁盘的缓存。比如block 0被映射到虚拟地址0x10000000，block 1被映射到虚拟地址0x10001000以此类推。
+我们将实现按需加载，只有当访问某个bolck对应的内存地址时出现页错误，才将该block从磁盘加载到对应的内存区域，然后重新执行内存访问指令。
+
+fs/fs.c中的fs_init()将会初始化super和bitmap全局指针变量。至此对于文件系统进程只要访问虚拟内存[DISKMAP, DISKMAP+DISKMAX]范围中的地址addr，就会访问到磁盘((uint32_t)addr - DISKMAP) / BLKSIZE block中的数据。如果block数据还没复制到内存物理页，bc_pgfault()缺页处理函数会将数据从磁盘拷贝到某个物理页，并且将addr映射到该物理页。这样FS进程只需要访问虚拟地址空间[DISKMAP, DISKMAP+DISKMAX]就能访问磁盘了。
+

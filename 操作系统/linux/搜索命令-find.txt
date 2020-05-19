@@ -1,0 +1,21 @@
+find
+
+* 查找文件申请
+
+-maxdepth  最大的搜索的文件深度
+
+* 文件类型
+
+-type 搜索的文件类型
+	b  block(buffered) special
+	c  character(unbuffered) special
+	d  directory
+	p  named pip(FIFO)
+	f  regular file（常规文件）
+	l  symbolic link
+	s  socket
+
+* 文件大小
+
+-size  -1M      //小于1M
+-size  +10k

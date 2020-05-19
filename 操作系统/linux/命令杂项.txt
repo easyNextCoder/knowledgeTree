@@ -1,0 +1,10 @@
+1. xrandr 用来改变分辨率
+
+选择分辨率：1920x1080为例
+xrandr -s 1920x1080
+
+2. 在使用apt-get install进行下载的时候，无法锁定那个lock文件，那就把那个lock文件删除之后再下载就行了。
+
+3. 反汇编命令
+	
+	objdump -d a.out>out.s
