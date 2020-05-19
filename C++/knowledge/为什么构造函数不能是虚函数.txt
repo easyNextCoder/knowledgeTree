@@ -1,0 +1,52 @@
+事实上，间接的构造一个对象的技术叫做virual constructor.
+
+Why don't we have virtual constructors?
+A virtual call is a mechanism to get work done given partial information. In particular, "virtual" allows us to call a function knowing only an interfaces and not the exact type of the object. To create an object you need complete information. In particular, you need to know the exact type of what you want to create. Consequently, a "call to a constructor" cannot be virtual.
+Techniques for using an indirection when you ask to create an object are often referred to as "Virtual constructors". For example, see TC++PL3 15.6.2.
+
+For example, here is a technique for generating an object of an appropriate type using an abstract class:
+
+	struct F {	// interface to object creation functions
+		virtual A* make_an_A() const = 0;
+		virtual B* make_a_B() const = 0;
+	};
+
+	void user(const F& fac)
+	{
+		A* p = fac.make_an_A();	// make an A of the appropriate type
+		B* q = fac.make_a_B();	// make a B of the appropriate type
+		// ...
+	}
+
+	struct FX : F {
+		A* make_an_A() const { return new AX();	} // AX is derived from A
+		B* make_a_B() const { return new BX();	} // BX is derived from B
+	};
+
+	struct FY : F {
+		A* make_an_A() const { return new AY();	} // AY is derived from A
+		B* make_a_B() const { return new BY();	} // BY is derived from B
+	};
+
+	int main()
+	{
+		FX x;
+		FY y;
+		user(x);	// this user makes AXs and BXs
+		user(y);	// this user makes AYs and BYs
+
+		user(FX());	// this user makes AXs and BXs
+		user(FY());	// this user makes AYs and BYs
+		// ...
+	}
+This is a variant of what is often called "the factory pattern". The point is that user() is completely isolated from knowledge of classes such as AX and AY.
+
+> http://www.stroustrup.com/bs_faq2.html#virtual-ctor
+
+含义大概是这样的：虚函数调用是在部分信息下完成工作的机制，允许我们只知道接口而不知道对象的确切类型。 要创建一个对象，你需要知道对象的完整信息。 特别是，你需要知道你想要创建的确切类型。 因此，构造函数不应该被定义为虚函数。
+
+从C++之父Bjarne的回答我们应该知道C++为什么不支持构造函数是虚函数了，简单讲就是没有意义。虚函数的作用在于通过子类的指针或引用来调用父类的那个成员函数。而构造函数是在创建对象时自己主动调用的，不可能通过子类的指针或者引用去调用。
+
+>https://blog.csdn.net/shilikun841122/article/details/79012779
+
+网络上的普遍解释是：虚函数相应一个指向vtable虚函数表的指针，但是这个指向vtable的指针事实上是存储在对象的内存空间的。假设构造函数是虚的，就须要通过 vtable来调用，但是对象还没有实例化，也就是内存空间还没有，怎么找vtable呢？所以构造函数不能是虚函数。

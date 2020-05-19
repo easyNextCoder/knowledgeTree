@@ -1,0 +1,13 @@
+map.erase(iter) 并不会返回指向下一个元素的iter
+所以要想连续的删除应该：map.erase(iter++);
+因为iter++返回的是元素的拷贝，是一个右值
+
+vector.erase(iter)返回的是指向下一个元素的iter所以全部删除元素就是：
+while(iter != vector.end())
+{
+	iter = vector.erase(iter);
+}
+
+https://stackoverflow.com/questions/4645705/vector-erase-iterator
+
+https://stackoverflow.com/questions/4600567/how-can-i-delete-elements-of-a-stdmap-with-an-iterator

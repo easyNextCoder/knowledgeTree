@@ -1,0 +1,3 @@
+const链接的时候的内外部属性：指的是是否在本文件内可以访问，以及链接到一起的非本文件是否可以访问
+
+>https://blog.csdn.net/dengtong7258/article/details/101888527

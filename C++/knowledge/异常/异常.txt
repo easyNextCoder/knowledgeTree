@@ -1,0 +1,30 @@
+## 异常在exception头文件中
+
+## 关键词3个：try  catch  throw
+
+## 语法结构：
+
+try{
+	//保护代码
+}catch(ExceptionClass e1){
+	//catch块
+}catch(ExceptionClass2 e2){
+	//catch块
+}
+
+## 异常的分类：
+* 所有异常的父类：exception
+	类型exception仅仅定义了拷贝构造函数、拷贝赋值运算符、一个虚析构函数和一个名为what()的虚成员，其中what函数返回一个const char*,该指针指向一个以null结尾的字符数组，并且保证不会抛出任何异常。
+* exception
+	* bad_cast
+	* runtime_error
+		* overflow_error
+		* underflow_error
+		* range_error
+	* logic_error
+		* domain_error
+		* invalid_argument
+		* out_of_range
+		* length_error
+	* bad_alloc
+

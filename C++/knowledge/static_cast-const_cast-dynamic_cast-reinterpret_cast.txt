@@ -1,0 +1,12 @@
+static_cast
+* 是一个最常用的转换，其实是与C语言下进行的类型转化；可以转换指针，普通类型，类类型等。
+* 不能转换掉表达式的const, volitate,_unaligned属性
+
+dynamic_cast
+* 常用于继承类之间的指针的转化
+
+const_cast
+* 将变量的const属性去除
+
+reinterpret_cast
+对类型进行重新解释，功能最强大，但是不安全

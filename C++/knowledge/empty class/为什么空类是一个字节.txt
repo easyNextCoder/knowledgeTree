@@ -1,0 +1,2 @@
+空类和空类生成的对象有一个字节的内存，是因为要区分不同的类。
+> http://www.stroustrup.com/bs_faq2.html#sizeof-empty

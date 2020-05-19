@@ -1,0 +1,7 @@
+static的函数是Internal linkage。不同编译单元可以有同名的static函数，但是该函数只对对应的编译单元课件。
+
+inline函数是external linkage。如果被不同编译单元调用，每个编译单元引用/链接的是**同一个函数同一个定义**
+
+static inline函数 = static函数
+
+inline的最大用处就是：非template函数，成员或非成员，把定义放在头文件中，定义前不加inline，如果头文件被多个translation unit（cpp文件）引用，编译器会报错multiple definition

@@ -1,0 +1,6 @@
+根据移动特性与施行操作，迭代器被分为五类：
+input iterator:这种迭代器所指的对象，不允许外界改变，只读
+output iterator:只写
+forward iterator:允许，写入型算法，如replace()在此种迭代器所形成的区间上进行读写操作
+bidirectional iterator:可双向移动，某些算法需要逆向走访某个迭代器区间（例如逆向拷贝某范围内的元素），可以使用Bidirectional iterators
+random access iterator:前四种迭代器都只供应一部分指针算术能力；前三种支持operator++,第四种再加上operator--，第五种则涵盖所有指针算术能力，包括p+n, p-n,p[n], p1-p2, p1<p2

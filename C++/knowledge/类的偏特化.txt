@@ -1,0 +1,19 @@
+template<typename U, typename V, typename T>
+class C{...};
+partial specialization的字面意思容易误导我们认为，所谓“偏特化版”一定是对template参数U或T（或某种组合）指定某个参数值。其实不然。
+
+[Austern99]对于partial specialization的意义解释是：partial specialization的意思是提供另一份template定义式，而其本身仍为templatized
+
+<泛型思维>一书对partial specialization的定义是：针对（任何）template参数更进一步的条件限制所设计出来的一个特化版本。
+
+举例：
+面对下面这样一个class template：
+template<typename T>
+class C{...}     //这个泛化版本允许（接受）T为任何类型
+
+他有一个partial specialzation的形式
+template<typename T>
+class C<T*>{...}		
+	//这个特化版本仅适用于"T为原生指针"的情况
+	//“T为原生指针”便是“T为任何型别”的一个更进一步的条件限制
+

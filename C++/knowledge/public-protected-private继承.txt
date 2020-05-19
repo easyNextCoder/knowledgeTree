@@ -1,0 +1,94 @@
+* public, protected, private继承的意思是，继承类将被继承类内的成员以何种形式进行封装，并向外（用户）提供接口。
+* class derived: public/protected/private base{}无论是以何种方式继承，继承类都能够访问到protected权限以下的成员。
+* 总结以上几点可以，不同的方式继承在面向客户和面向类的时候是不同的含义的
+
+#include <iostream>
+
+using namespace std;
+
+
+class Base {
+	friend void testFunc(Base& input);
+public:
+	int pub = 0;
+protected:
+	int pro = 0;
+
+private:
+	int pri = 0;
+};
+
+void testFunc(Base& input)
+{
+	input.pri = 0;
+}
+
+
+class Derivedpub:public Base {
+public:
+	
+	void setBasepub(int value)
+	{
+		pub = value;
+	}
+	void setBasepro(int value)
+	{
+		pro = value;
+	}
+	void setBasepri(int value)
+	{
+		pri = value;
+	}
+};
+
+class Derivedpro :protected Base {
+public:
+	void setBasepub(int value)
+	{
+		pub = value;
+	}
+	void setBasepro(int value)
+	{
+		pro = value;
+	}
+	void setBasepri(int value)
+	{
+		pri = value;
+	}
+};
+
+class Derivedpri :private Base {
+public:
+	void setBasepub(int value)
+	{
+		pub = value;
+	}
+	void setBasepro(int value)
+	{
+		pro = value;
+	}
+	void setBasepri(int value)
+	{
+		pri = value;//不可以访问
+	}
+};
+
+int main()
+{
+	Derivedpub puba;
+	Derivedpro proa;
+	Derivedpri pria;
+
+	/*
+	cout << "其实protected有意义吗？" << endl;
+
+	puba.pub = 0;
+	puba.pro = 0;
+
+	proa.pub = 0;
+	proa.pro = 0;
+	*/
+
+
+
+}

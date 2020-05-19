@@ -1,0 +1,22 @@
+* 友元函数解决的问题：外部函数通过传参在自己的函数体内能够调用类内私有成员
+* 思考：
+（1）或许对于操作符重载函数== +函数在进行重载时有意义，但是对于普通函数不通过函数接口去访问私有成员，而是给与其更高的权限，是否违背对象的封装的原则？Effective C++：朋友过多了带来烦恼
+（2）对于友元类来说呢？意义
+
+* 在C++ Primer中的第七章中有访问控制
+
+class Sales_data{
+	friend Sales_data add(const Sales_data&, const Sales_data&);
+	friend std::istream &read(std::istream&, Sales_data&);
+
+private:
+	string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+}
+
+
+istream& read(istream& cin, Sales_data& item)
+{
+	cin>>item.bookNo>>item.units_sold>>revenue;
+}

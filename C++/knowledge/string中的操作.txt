@@ -1,0 +1,4 @@
+* 字符串指针转化为string
+
+	string name;
+	name.copy(p,len,0);
