@@ -1,0 +1,30 @@
+
+socket(int domain, int type, int protocol)
+domain :协议族（有IP4，IP6等）
+type:传输类型（双向连接字节流，数据报等）
+
+* 类型为SOCK_STREAM的套接字表示一个双向的字节流，与管道类似。流式的套接字在进行数据收发之前必须已经连接，连接使用**connect()**函数进行。一旦连接，可以使用read()或者write()函数进行数据的传输。流式通信方式保证数据不会丢失或者重复接收，当数据在一段时间内任然没有接受完毕，可以认为这个连接已经死掉。
+
+* SOCK_DGRAM和SOCK_RAW 这个两种套接字可以使用函数**sendto()**来发送数据，使用recvfrom()函数接受数据，recvfrom()接受来自制定IP地址的发送方的数据。
+
+* SOCK_PACKET是一种专用的数据包，它直接从设备驱动接受数据。
+
+protocol:用于制定某个协议的特定类型，即type类型中的某个类型，通常某协议中只有一种特定类型，这样protocol参数仅能设置为0；但是有些协议有多种特定的类型，就需要设置这个参数来选择特定的类型。
+
+例子：
+
+/* Standard well-defined IP protocols. ?*/
+enum {
+? IPPROTO_IP = 0, /* Dummy protocol for TCP*/
+#define IPPROTO_IP IPPROTO_IP
+? IPPROTO_ICMP = 1, /* Internet Control Message Protocol*/
+#define IPPROTO_ICMP IPPROTO_ICMP
+? IPPROTO_IGMP = 2, /* Internet Group Management Protocol*/
+#define IPPROTO_IGMP IPPROTO_IGMP
+? IPPROTO_IPIP = 4, /* IPIP tunnels (older KA9Q tunnels use 94) */
+#define IPPROTO_IPIP IPPROTO_IPIP
+? IPPROTO_TCP = 6, /* Transmission Control Protocol*/
+
+...
+
+https://blog.csdn.net/oliverlyn/article/details/54285992
