@@ -1,0 +1,19 @@
+# makefile example
+CC=gcc
+CFLAGS = -Wall -O2 
+CFLAGS += -I./  -L./
+LFLAGS = -lpthread -lm 
+
+SRCS = fun1.c \
+	fun2.c  \
+	main.c
+
+OBJS=$(SRCS:.c=.o)
+
+EXEC=test
+
+all:$(OBJS)
+        $(CC) $(CFLAGS) $(OBJS) -o $(EXEC) $(LFLAGS)
+
+clean:
+        rm -rf $(EXEC) $(OBJS)

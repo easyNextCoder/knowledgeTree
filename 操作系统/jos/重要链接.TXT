@@ -1,0 +1,2 @@
+http://www.iakovlev.org/index.html?p=2302&m=1&l1=2
+https://pdos.csail.mit.edu/6.828/2018/readings/i386/toc.htm

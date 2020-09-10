@@ -1,0 +1,22 @@
+消息队列的定义：
+消息队列是消息的链接表，存放在内核中。一个消息队列由一个标识符（即队列ID）来标识
+
+消息队列的特点：
+消息队列是面向记录的，其中的消息具有特定的格式以及特定的优先级。
+消息队列独立于发送与接收进程。进程终止时，消息队列及器内容并不会被删除。
+消息队列可以实现消息的随机查询，消息不一定要以先进先出的次序读取，也可以按照消息的类型读取。
+
+函数原型：
+#include <sys/msg.h>
+
+//创建或打开消息队列：成功返回队列ID，失败返回-1
+int msgget(key_t key, int flag);
+
+//添加消息：成功返回0，失败返回1
+int msgsnd(int msqid, const void *ptr, size_t size, int flag);
+
+//读取消息：成功返回消息数据的长度，失败返回-1
+int msgrcv(int msqid, void *ptr, size_t size, long type, int flag);
+
+//控制消息队列：成功返回0，失败返回-1；
+int msgctl(int msqid, int cmd, struct msqid_ds *buf);

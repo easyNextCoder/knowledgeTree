@@ -1,0 +1,6 @@
+C++stl
+vector array差别
+
+push_back, emplace_back差别
+
+push_back均摊时间复杂度

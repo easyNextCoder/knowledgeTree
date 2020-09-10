@@ -1,0 +1,19 @@
+功能：
+信号量与之前的结构不同，它是一个计数器。信号量用于实现进程间的互斥与同步，而不是用于存储进程间通信数据。
+特点：
+1.信号量用于进程间同步
+2.信号量基于操作系统的PV操作，程序对信号量的操作都是原子操作
+函数：
+创建一个信号量
+semget(key,  1,  IPC_CREAT|0666)
+
+信号量操作
+struct sembuf sbuf;
+sbuf.sem_num = 0; /*序号*/
+sbuf.sem_op = 1;  /*V操作*/-1是P操作
+sbuf.sem_flg = SEM_UNDO;
+semop(sem_id,  &sbuf, 1);
+
+删除一个信号量
+union semun tmp;
+semctl(sem_id, 0, IPC_RMID, tmp);

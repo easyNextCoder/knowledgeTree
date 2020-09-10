@@ -1,12 +1,52 @@
 static_cast
+https://blog.csdn.net/zhouwei1221q/article/details/44978361
 * 是一个最常用的转换，其实是与C语言下进行的类型转化；可以转换指针，普通类型，类类型等。
 * 不能转换掉表达式的const, volitate,_unaligned属性
-
+* 是一个静态类型转换，而不是一个动态类型转换，在转换时不会进行运行时动态类型检查，
+  从基类向子类转换时会造成错误
+（所有的代码中的隐式转换均可以通过static_cast来进行转换）
 dynamic_cast
 * 常用于继承类之间的指针的转化
-
+* 是一个动态类型的类型转换，在转换时会进行运行时动态类型检查，所以在进行父类向子类进行转换的时候
+  会报错提示。
 const_cast
 * 将变量的const属性去除
+* 这个转换即可以对一个成员变量做，也可以对一个常量的方法来做，去除方法的const属性
 
 reinterpret_cast
 对类型进行重新解释，功能最强大，但是不安全
+
+
+static_cast和dynamic_cast的区别的实验代码：
+
+#include <iostream>
+
+using namespace std;
+
+class CB{
+public:
+    int getInt(){return 1;}
+};
+
+class CI:public CB{
+
+};
+int main()
+{
+    CB* p = new CI();
+    CB &t = *p;
+
+    cout<<typeid(CB*).name()<<endl;
+    cout<<typeid(*p).name()<<endl;
+    cout<<typeid(CB&).name()<<endl;
+    cout<<typeid(t).name()<<endl;
+    cout<<typeid(CI).name()<<endl;
+
+    CI* derived = new CI();
+    CB* base = new CB();
+    //base = static_cast<CB*>(derived);
+    //derived = static_cast<CI*>(base);
+    derived = dynamic_cast<CI*>(base);
+
+    return 0;
+}

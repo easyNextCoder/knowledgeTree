@@ -1,0 +1,3 @@
+* chgrp:改变文件所属群组
+* chown:改变文件拥有者
+* chmod：改变文件的权限，SUID, SGID, SBIT等等特性

@@ -1,0 +1,65 @@
+自己编写归并排序或者快排->自己的快排写失误了！把i=first写成了i=first+1
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int getProvit(int first, int last, vector<int>&v)
+{
+    int mid = (first+last)/2;
+    if(v[first]>v[last])
+        swap(v[first], v[last]);
+    if(v[mid] > v[last])
+        swap(v[mid], v[last]);
+    if(v[mid] < v[first])
+        swap(v[mid], v[first]);
+    return v[mid];
+}
+
+void qsort(int first, int last, vector<int>&v)
+{
+    if(last - first + 1 <= 2)
+    {
+        if(last - first + 1 == 2 && v[first] > v[last])
+            swap(v[first], v[last]);
+        return;
+    }else{
+        int mid = (first+last)/2;
+        int provit = getProvit(first, last, v);
+        swap(v[mid], v[last-1]);
+        int i = first;
+        int j = last-1;
+        for(;;)
+        {
+            while(v[++i] < provit){;}
+            while(v[--j] > provit){;}
+            
+            if(i < j)
+            {
+                swap(v[i], v[j]);
+            }else{
+                break;
+            }
+        }
+        swap(v[i], v[last-1]);
+        qsort(first, i-1, v);
+        qsort(i+1, last, v);
+        
+    }
+    
+    
+    return;
+}
+
+int main() {
+    //int a;
+    //cin >> a;
+    vector<int> vec = {9,8,7,6,5,4,3,2};
+    qsort(0, vec.size()-1, vec);
+    for(auto& item:vec)
+    {
+        cout<<item<<" ";
+    }
+    cout<<endl;
+    cout << "Hello World!" << endl;
+}

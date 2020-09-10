@@ -1,0 +1,8 @@
+#include <unistd.h>
+#include <fcntl.h>
+
+#define BUFFERLEN 100
+
+open("fork.c", O_RDONLY);
+char * p = new char[BUFFERLEN];
+read(open("fork.c", O_RDONLY), p, BUFFERLEN);

@@ -57,3 +57,28 @@ git checkout -b mybranch
 切换到master分支：$git checkout master
 
 >https://blog.csdn.net/carolzhang8406/article/details/49757101
+
+
+学习git的最直观的方法：打游戏
+> https://learngitbranching.js.org/?locale=zh_CN
+
+游戏中使用的命令
+git branch -f branchname fe30  
+    fe30(是head的名称，这个命令强制将branchname这个分支向前或者向后移动到fe30这个HEAD处)
+
+git rebase branchname
+
+    将branchname处的提交拿到自己的提交下面，使提交更加线性
+
+git rebase -i HEAD~3
+
+    改变从当前HEAD处开始包括这个结点的前面三个结点的顺序，可以排列他们的顺序，并且可以删除
+    这些操作是git会给提供一个ui来让我们操作
+
+git cherry-pick fe30 fec3 ...
+
+    将非当前分支的提交，pick到当前分支
+
+git commit --amend
+
+    就是反悔当前的提交，用现在的提交代替之前的那个提交（但是实际上生成了一个新的HEAD）
