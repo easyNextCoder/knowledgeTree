@@ -1,0 +1,1 @@
+https://refactoringguru.cn/design-patterns/singleton/cpp/example#example-1

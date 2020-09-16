@@ -1,0 +1,17 @@
+https://zhuanlan.zhihu.com/p/39970630
+
+LT模式：level-trigger模式下只要某个socket处于readable/writable状态，无论什么时候
+进行epoll_wait都会返回该socket。()
+
+ET模式：edge-trigger模式下只有某个socket从unreadable变为readable或者从unwritalbe
+变为writable时，epoll_wait才会返回该socket。（相当于一个矩形波）
+
+epoll_create在系统中内核中创建一个红黑树和就绪链表
+
+epoll_ctl时，如果增加socket句柄，则检查在红黑树中是否存在，存在立即返回，不存在则
+	添加到树干上，然后向内核注册回调函数，用于当中断事件来临时向准备就绪链表
+	中插入数据(所以，当一个socket上有数据到了，内核把网卡上的数据copy到内核
+	中后就来把socket插入到准备就绪链表里了。)
+
+epoll_wait:执行epoll_wait时立刻返回准备就绪链表里的数据即可。
+

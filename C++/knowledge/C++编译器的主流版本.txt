@@ -1,0 +1,4 @@
+C++编译器主要有：
+1. MS的Visual C++的MSVC编译器
+2. 遵循GPL软件协议的g++
+3. 遵循BSD的LLVM编译器

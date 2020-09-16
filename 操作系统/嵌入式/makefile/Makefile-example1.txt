@@ -1,0 +1,51 @@
+#
+# Makefile for nps ingate exec, by denghuibin
+#
+# *** TODO: (1) change 'test' to whatever you want for output file-name.
+EXECUTABLE = he
+
+
+CXX = g++
+CXXFLAGS  =  -W -g -O2 -DDEBUG
+COMPILE = $(CXX) $(CXXFLAGS)
+
+# *** TODO: (2) add paths of include files.
+INC  := -I./include -I./include/net-snmp 
+
+# *** TODO: (3) add paths of source files.
+SRCS := $(wildcard *.cpp) $(wildcard ./src/*.cpp)
+OBJS := $(patsubst %.cpp,%.o, $(SRCS))
+#DEPS := $(patsubst %.o,%.d, $(OBJS))
+
+# *** TODO: (4) add library to project.
+LIBS := -lrt ./lib/libnetsnmp.a
+
+#
+# Output file
+#
+all: $(EXECUTABLE)
+$(EXECUTABLE) : $(OBJS)
+	$(CXX) -o $(EXECUTABLE) $(OBJS) $(LIBS)
+
+#
+# specify the dependency
+#
+%.d : %.c
+	$(CXX) $(INC) -MM $< > $@
+	$(CXX) $(INC) -MM $< -MQ $@  >> $@
+#
+# specify that all .o files depend on .cpp files, and indicate how to realize it
+#
+%.o : %.cpp
+	$(COMPILE) -c $(INC) -o $@ $<
+
+.PHONY: clean
+clean:
+	-rm $(EXECUTABLE)
+	-rm $(OBJS)
+	rm -f *.bak *.o
+#	-rm $(DEPS)
+#depend : $(DEPS)
+#	@echo "Dependencies are now up-to-date."
+
+#-include $(DEPS)

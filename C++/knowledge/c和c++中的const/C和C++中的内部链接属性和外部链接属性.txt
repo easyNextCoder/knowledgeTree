@@ -1,0 +1,5 @@
+
+>https://blog.csdn.net/dengtong7258/article/details/101888527
+
+在C++中const和static的内部链接属性是相同的，即不可以从外部链接这种类型的变量。
+但是const在C和C++中的链接属性是不相同的，在C++中其他文件不可以链接到const类型的变量，但是在C下就可以
