@@ -1,0 +1,68 @@
+//朴素写法
+#include <iostream>
+
+using namespace std;
+
+int V[1001];
+int W[1001];
+int f[1001][1001];//f[i][j];所有满足条件1， 条件2的集合；所以前i个物品并且总体积不超过j的集合
+                    //属性：max
+                    //最终答案：f(N, V)
+                    //状态计算：找最后的不同点，选择不选择第i个物品的方案
+int main()
+{
+    int n, m;
+    cin>>n>>m;
+    for(int i = 1; i<=n; i++)
+    {
+        cin>>V[i]>>W[i];
+    }
+
+    for(int i = 1; i<=n; i++)//前i个
+    {
+        for(int j = 0; j<=m; j++)//体积
+        {
+            f[i][j] = f[i-1][j];
+            if(j >= V[i])
+                f[i][j] = max(f[i-1][j], f[i-1][j-V[i]] +W[i]);
+        }
+    }
+    
+    cout<<f[n][m]<<endl;
+    return 0;
+}
+//优化写法
+#include <iostream>
+
+using namespace std;
+
+int V[1001];
+int W[1001];
+int f[1001];//f[i][j];所有满足条件1， 条件2的集合；所以前i个物品并且总体积不超过j的集合
+                    //属性：max
+                    //最终答案：f(N, V)
+                    //状态计算：找最后的不同点，选择不选择第i个物品的方案
+int main()
+{
+    int n, m;
+    cin>>n>>m;
+    for(int i = 1; i<=n; i++)
+    {
+        cin>>V[i]>>W[i];
+    }
+    for(int i = 1; i<=n; i++)//前i个
+    {
+        for(int j = m; j>=0; j--)//体积
+        {
+            if(j>=V[i])
+            f[j] = max(f[j], f[j-V[i]] +W[i]);
+        }
+    }
+    
+    cout<<f[m]<<endl;
+    return 0;
+}
+/*
+    总结：
+    区别点在于j变成了从大到小进行遍历，这样以来f[j] = max(f[j], f[j-V[i]]+W[i])种f[j-V[i]]是上一次遍历的值！
+ */
