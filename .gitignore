@@ -11,6 +11,9 @@
 ## 自己定义的变量
 *.exe
 
+#goland
+.idea/*
+
 # User-specific files
 *.rsuser
 *.suo
