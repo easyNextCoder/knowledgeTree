@@ -48,5 +48,13 @@ linux中的正则表达式和其他语言中使用的正则表达式
 
 * Git fetch && git rebase origin/master && git push **能减少两次git checkout的切换，一定要试一试**
 
+9. 将go中的位操作总结下来
+10. mysql中show master status能显示数据库当前在写的binlog文件名和当前的position
+11. mysql使用auto_increment是效率最高的，但是也会产生坏的影响，例如产生热点id争用现象
+12. grant all privileges on *.* to 'root'@'localhost' identified by 'root' with grant option; 权限操作学习
 
 
+
+
+
+go: github.com/stnc/pongo2gin invalid version: git fetch -f origin refs/heads/*:refs/heads/* refs/tags/*:refs/tags/* in /go/pkg: exit status 128: fatal: could not read Username for 'https://github.com': terminal prompts disabled

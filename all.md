@@ -63,7 +63,7 @@ https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName=xyk-web-data
 
 ### C(consistency)一致性
 
-### I隔离性
+### I(Isolation)隔离性
 
 * 实现原理
   MVCC多版本并发控制（读取数据的时候，通过一种类似快照的方式将数据保存下来，这样读锁和写锁就不冲突了，不同的事务session会看到自己特定版本的数据，版本链。）
@@ -87,7 +87,7 @@ https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName=xyk-web-data
   * 快照读
     像不加锁的select操作就是快照读，即不加锁的非阻塞读。快照读的前提是隔离级别不是未提交读和串行化级别，因为未提交读总是读取最新的数据行，而不是符合当前事务版本的数据行。而串行化则会对所有读取的行都加锁
 
-### D持久化
+### D(Durablity)持久化
 
 ​	持久化依靠的是redo log
 
@@ -122,7 +122,12 @@ https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName=xyk-web-data
 
   
 
-#### 存储结构
+#### [内存结构](https://dev.mysql.com/doc/refman/5.7/en/innodb-in-memory-structures.html)
+
+- [缓冲池](https://dev.mysql.com/doc/refman/5.7/en/innodb-buffer-pool.html)
+- [更改缓冲区](https://dev.mysql.com/doc/refman/5.7/en/innodb-change-buffer.html)
+- [自适应哈希索引](https://dev.mysql.com/doc/refman/5.7/en/innodb-adaptive-hash.html)
+- [日志缓冲区](https://dev.mysql.com/doc/refman/5.7/en/innodb-redo-log-buffer.html)
 
 ![](https://oss-emcsprod-public.modb.pro/wechatSpider/modb_20210918_ec08ea90-1816-11ec-8281-38f9d3cd240d.png)
 
@@ -130,46 +135,88 @@ https://portal.qiniu.com/kodo/bucket/resource-v2?bucketName=xyk-web-data
 
   innodb 引擎默认的数据页是16kb，而buffer pool启动的时候是默认的128M，所以是有8192个数据页的。而磁盘的数据管理也是用数据页为单位来管理的，所以每次查找数据的时候，先请求buffer pool，buffer pool中没有的话会到磁盘中找到对应的数据页，然后copy到buffer pool中给客户端返回。
 
-  * Buffer Pool
+  * [Buffer Pool](https://dev.mysql.com/doc/refman/5.7/en/innodb-buffer-pool.html)
 
-    * Free list
-      空闲页链表
+    * Buffer Pool
 
-    * Flush list
-      脏页链表
+      * Free list
+        空闲页链表
 
-    * LRU list
+        ##### 1. 怎么知道数据页是否被缓存？
+  
+        数据库中有一个**`数据页缓存哈希表`**我，用**`表空间号+数据页号`，作为一个key，然后缓存页的地址作为value**表空间号+数据页号 = 缓存页地址
+  
+      * Flush list
+        脏页链表
 
-      数据链表（冷热数据链表-用以解决缓冲池污染问题）
+      * LRU list
+  
+        数据链表（冷热数据链表-用以解决缓冲池污染问题）
+  
+        * 冷数据块3/8
+        * 热数据块5/8
+  
+    ![](https://dev.mysql.com/doc/refman/5.7/en/images/innodb-buffer-pool-list.png)
+    
 
-      * 冷数据块3/8
-      * 热数据块5/8
+    * Change Buffer
 
-  * Change Buffer
+      [链接1](https://juejin.cn/post/6844903874172551181)
 
-    [链接1](https://juejin.cn/post/6844903874172551181)
+      [链接2](https://juejin.cn/post/6844903875271475213)
 
-    [链接2](https://juejin.cn/post/6844903875271475213)
+      对于为非唯一索引，辅助索引的修改操作并非实时更新索引的叶子页，而是把若干对同一页面的更新缓存起来做，合并为一次性更新操 作，减少IO，转随机IO为顺序IO,这样可以避免随机IO带来性能损耗，提高数据库的写性能
 
-    对于为非唯一索引，辅助索引的修改操作并非实时更新索引的叶子页，而是把若干对同一页面的更新缓存起来做，合并为一次性更新操 作，减少IO，转随机IO为顺序IO,这样可以避免随机IO带来性能损耗，提高数据库的写性能
+      具体流程：
 
-    具体流程：
-
-    先判断要更新的这一页在不在缓冲池中
-
-    a、若在，则直接插入；
-
-    b、若不在，则将index page 存入Change Buffer，按照Master Thread的调度规则来合并非唯一索引和索引页中的叶子结点
-    原文链接：https://blog.csdn.net/MortShi/article/details/122506516
-
-    * 为什么只对辅助索引有作用？
-      如果数据库都是唯一索引，那么在每次操作的时候都需要判断索引是否有冲突，势必要将数据加载到缓存中对比，因此也用不到 Change Buffer。
-
+      先判断要更新的这一页在不在缓冲池中
+  
+      a、若在，则直接插入；
+  
+      b、若不在，则将index page 存入Change Buffer，按照Master Thread的调度规则来合并非唯一索引和索引页中的叶子结点
+      原文链接：https://blog.csdn.net/MortShi/article/details/122506516
+  
+      * 为什么只对辅助索引有作用？
+        如果数据库都是唯一索引，那么在每次操作的时候都需要判断索引是否有冲突，势必要将数据加载到缓存中对比，因此也用不到 Change Buffer。
+  
+    * 如何解决buffer pool污染
+      新读取的块被插入到 LRU 列表的中间。所有新读取的页面都插入到默认情况下`3/8`位于 LRU 列表尾部的位置。当页面在缓冲池中第一次被访问时，它们被移动到列表的前面（最近使用的一端）。因此，从未访问过的页面永远不会进入 LRU 列表的前面部分，并且比使用严格的 LRU 方法更快地“老化” 。这种安排将 LRU 列表分为两部分，其中插入点下游的页面被认为是“旧的”并且是 LRU 驱逐的理想受害者。
+  
   * Log Buffer
 
 [buffer原理讲解1](https://www.modb.pro/db/111341)
 
 [buffer原理讲解2](https://blog.csdn.net/weixin_35952290/article/details/115906914)
+
+#### [文件存储结构](https://zhuanlan.zhihu.com/p/429567830)
+
+InnoDB的物理文件有很多种，包括：
+
+1. 系统表空间（system tablespace）。文件以 ibdata1、ibdata2 等命名，包括元数据数据字典（表、列、索引等）、double write buffer、插入缓冲索引页（change buffer）、系统事务信息（sys_trx）、默认包含 undo 回滚段（rollback segment）。
+2. 用户表空间。innodb_file_per_table=true 时，一个表对应一个独立的文件，文件以 db_name/table_name.ibd 命名。行存储在这类文件。另外还有 5.7 之后引入 General Tablespace，可以将多个表放到同一个文件里面。
+3. redo log。文件以 ib_logfile0、ib_logfile1 命名，滚动写入。主要满足ACID特性中的 Durablity 特性，保证数据的可靠性，同时把随机写变为内存写加文件顺序写，提高了MySQL的写吞吐。
+4. 另外还可能存在临时表空间文件、undo 独立表空间等。
+
+分为一个ibd数据文件-->Segment（段）-->Extent（区）-->Page（页）-->Row（行）
+
+一般情况下一个段管理256个区，每个区1MB大小，如果设置的page是16K那么就有64个，否则个数随着page的大小变化而变化
+
+![](https://pic1.zhimg.com/80/v2-330ad504926d516ebc57acd8cba3c590_1440w.jpg)
+
+
+
+
+
+![](https://pic2.zhimg.com/80/v2-b0c81c6ad80d3a28be6d226645d693a1_1440w.jpg)
+
+
+
+
+
+#### 监控命令
+
+InnoDB实时监控
+mysql> show engine innodb status\G
 
 
 
@@ -333,6 +380,15 @@ SELECT…FOR SHARE是 MySQL 8.0 的一项功能，它取代了SELECT……LOCK I
 
 ### 按照属性划分
 
+- [Shared and Exclusive Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-shared-exclusive-locks)
+- [Intention Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-intention-locks)
+- [Record Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-record-locks)
+- [Gap Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-gap-locks)
+- [Next-Key Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-next-key-locks)
+- [Insert Intention Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-insert-intention-locks)
+- [AUTO-INC Locks](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-auto-inc-locks)
+- [Predicate Locks for Spatial Indexes](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html#innodb-predicate-locks)
+
 * 共享锁
 
   共享锁又称读锁，一个事务为数据加上了读锁之后，其他事务只能对该数据加读锁，而不能加写锁
@@ -405,37 +461,40 @@ SELECT…FOR SHARE是 MySQL 8.0 的一项功能，它取代了SELECT……LOCK I
 
   由DBMS提供，用于让用户或程序员使用，实现对数据库中数据的操作。
   DML分成交互型DML和嵌入型DML两类。
-  依据语言的级别，DML又可分成过程性DML和非过程性DML两种。
-  需要commit.
-  SELECT
-  INSERT
-  UPDATE
-  DELETE
-  MERGE
-  CALL
-  EXPLAIN PLAN
-  LOCK TABLE
+  依据语言的级别，DML又可分成过程性DML和非过程性DML两种。**需要commit**.
+  
+  * SELECT
+  * INSERT
+  * UPDATE
+  * DELETE
+  * MERGE
+  * CALL
+  * EXPLAIN PLAN
+  * LOCK TABLE
 
 * DDL数据库定义语言
 
   DDL是**SQL**语言的四大功能之一。
   用于定义数据库的三级结构，包括外模式、概念模式、内模式及其相互之间的映像，定义数据的完整性、安全控制等约束
-  DDL不需要commit.
-  CREATE
-  ALTER
-  DROP
-  TRUNCATE
-  COMMENT
-  RENAME
+  **DDL不需要commit**.
+
+  * CREATE
+  * ALTER
+  * DROP
+  * TRUNCATE
+  * COMMENT
+  * RENAME
 
 * **DCL**（**Data Control Language**）**数据库控制语言** 授权，角色控制等
-  GRANT 授权
-  REVOKE 取消授权
-
+  
+  * GRANT 授权
+  * REVOKE 取消授权
+  
 * **TCL**（**Transaction Control Language**）**事务控制语言**
-  SAVEPOINT 设置保存点
-  ROLLBACK 回滚
-  SET TRANSACTION
+  
+  * SAVEPOINT 设置保存点
+  * ROLLBACK 回滚
+  * SET TRANSACTION
 
 **SQL主要分成四部分**：
 （1）数据定义。（SQL DDL）用于定义SQL模式、基本表、视图和索引的创建和撤消操作。
@@ -443,7 +502,7 @@ SELECT…FOR SHARE是 MySQL 8.0 的一项功能，它取代了SELECT……LOCK I
 （3）数据控制。包括对基本表和视图的授权，完整性规则的描述，事务控制等内容。
 （4）嵌入式SQL的使用规定。涉及到SQL语句嵌入在宿主语言程序中使用的规则。
 
-### 查配置
+### 查索引
 
 show index from tb_name;
 
@@ -535,7 +594,16 @@ IFNULL(1/0,'yes');
 
 ### update ... set ... case ... when...end
 
-(case when end) as ...
+(case when end) as ...用法
+
+```mysql
+sum(CASE operation
+WHEN 'Buy' THEN -price
+WHEN 'Sell' THEN price
+END) as total
+```
+
+
 
 [1393. 股票的资本损益](https://leetcode.cn/problems/capital-gainloss/)
 
@@ -607,6 +675,43 @@ show variables like '%log_bin%'  查看是否开启了bin log日志
 
 ### 权限设置
 
+* 创建用户create
+  create user 'ua'@'%' identified by 'pa';
+
+  表示创建的用户名为ua密码是pa，其中%表示用户可以通过任何ip地址以该身份登录到这个数据库
+
+* 删除用户delete
+  delete from mysql.user where user='ua';flush privileges;
+
+* 赋予权限grant
+
+  赋予用户ua最高的权限
+  grant all privileges on \*.\* to 'ua'@'%' with grant option;
+
+* 收回权限revoke
+
+  ```mysql
+  revoke all privileges on *.* from 'ua'@'%';
+  ```
+
+* 权限控制的颗粒度
+
+  * 对某个库的权限单独操作
+
+  ```mysql
+  grant all privileges on db1.* to 'ua'@'%' with grant option;
+  ```
+
+  * 表权限和列权限
+
+  ```mysql
+  create table db1.t1(id int, a int);
+  grant all privileges on db1.t1 to 'ua'@'%' with grant option;
+  GRANT SELECT(id), INSERT (id,a) ON mydb.mytbl TO 'ua'@'%' with grant option;
+  ```
+
+  
+
 ### 临时表视图
 
 ### 外键
@@ -615,39 +720,77 @@ show variables like '%log_bin%'  查看是否开启了bin log日志
 
 ## 日志
 
+### [Undo Log](https://dev.mysql.com/doc/refman/5.7/en/innodb-undo-logs.html)
+
+回滚日志，由**引擎层**来实现
+
+* 功能
+
+  保证事务的原子性(回滚)和MVCC
+
+* 特点
+  
+  1. 每次undo在写入磁盘之前，会先将该动作记录到redo上。是**逻辑日志**，可以认为当delete一条日志的时候，undo log中会对应insert一条记录。
+  
+  2. Undo的磁盘结构并不是顺序的，而是像数据一样按Page管理
+  
+     Undo写入时，也像数据一样产生对应的Redo Log
+  
+     Undo的Page也像数据一样缓存在Buffer Pool中，跟数据Page一起做LRU换入换出，以及刷脏。
+     Undo Page的刷脏也像数据一样要等到对应的Redo Log 落盘之后
+  
+     [链接](https://www.zhihu.com/question/357887214/answer/2204930465)
+  
+  3. undolog写到redolog中，mysql在进行recover的时候，所用到的undo日志是从redo log里恢复的。msql为了降低复杂度，是将鞋undolog也看做普通的数据写入
+
+![](https://img-blog.csdnimg.cn/20210613084841967.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70)
+
+
+
+回滚日志中记录着row_id、事务id、回滚指针。如果事务的第一条语句是插入语句，那么他的回滚指针就是null，update之后生成的undo log的回滚指向上一条语句进而形成一条undo log回滚链。
+
+
+
+### Redo Log 
+
+重做日志（物理日志），由**引擎层**实现。是为了实现事务的持久性而出现的产物。防止在发生故障的时间点，尚有脏页未写入表的IBD文件中，在重启Mysql服务的时候，根据Redo Log进行重做，从而达到事务的未入磁盘数据进行持久化这一特性。
+
+![](https://img-blog.csdnimg.cn/c999e31d8277467087615ba2260da330.png)
+
+
+
 ### Bin Log 
 
-归档日志（逻辑日志）binlog涉及的技术点-两阶段提交（实现crash-safe）、组提交（降低IO频率）
+归档日志（逻辑日志），由**服务层**实现，所以只要是mysql无论什么引擎都会有
 
-#### binlog特点
+#### 特点
 
 * 二进制日志
 * Binlog在MySQL的Server层实现（引擎共用）
 * Binlog为逻辑日志，记录的是一条语句的原始逻辑
 * Binlog不限大小，追加写入，不会覆盖以前的日志
 
-#### binlog命令
+#### 功能
 
-* sync_binlog参数
+主从复制、crash-safe
+
+#### 高级
+
+* XA事务（两阶段提交）实现系统的crash-safe
+* 支持组提交降低磁盘的iops压力
+
+#### binlog参数
+
+* 查询是否开启binlog记录功能
+  show variables like 'log_bin'
+
+* sync_binlog
   设置为1，表示每次事务binlog都将持久化到磁盘
 
-* flush logs
-  会多一个最新的bin-log日志
+* binlog_format
+  binlog一共三种格式Row（记录每行修改信息）、Statement（语句）、Mixed（混合模式默认的）
 
-* show master status
-  查看最后一个bin-log日志的相关信息
-
-* reset master
-  清空所有的bin-log日志
-
-  * reset slave
-    删除slave的中继日志
-
-* /usr/local/mysql/bin/mysqlbinlog  -no-defaults /usr/local/mysql/data/mysql-bin.000001
-  查看bin-log内容
-
-* Show variables like 'binlog_format'
-  查看binlog的格式.binlog一共三种格式Row（记录每行修改信息）、Statement（语句）、Mixed（混合模式）
+  查看binlog的格式：Show variables like 'binlog_format'
 
   * row
 
@@ -655,9 +798,35 @@ show variables like '%log_bin%'  查看是否开启了bin log日志
 
     优点：在row模式下，bin-log中可以不记录执行的[sql语句](https://so.csdn.net/so/search?q=sql语句&spm=1001.2101.3001.7020)的上下文相关信息，仅仅需要记录哪一条记录被修改了，修改成什么信样了，所以row的日志内容会非常清楚的记录下每一行数据修改的细节，非常容易理解。而且不会出现在某些特定情况下的存储过程和function，以及trigger的调用和处罚无法被正确问题。
 
-* Show variable like 'max_binlog_size'
+* max_binlog_size
+  查看最大binlogsize的命令：Show variable like 'max_binlog_size'
 
-  显示binlog文件的最大大小，默认是1GB，当文件大于1GB的时候会生成新的文件
+  显示binlog文件的最大大小，默认是1GB，当文件大于1GB的时候会生成新的文件， 使用flush log也可新生成一个binlog文件
+
+* log_bin_basename
+
+  查看日志存储地址
+
+  Show variables like 'log_bin_basename'
+
+#### binlog命令
+
+##### 操作binlog
+
+* flush logs
+  会多一个最新的bin-log日志
+* show master status
+  查看最新的binlog日志的相关信息
+* reset master
+  清空所有的bin-log日志
+* reset slave
+  删除slave的中继日志
+* /usr/local/mysql/bin/mysqlbinlog  -no-defaults /usr/local/mysql/data/mysql-bin.000001
+  **查看bin-log内容**
+* 查看此时的binlog日志记录
+  show binlog events in 'bingo.000002'
+
+##### 数据恢复
 
 * [恢复指定位置段数据](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery-binlog.html)  
   mysqlbinlog --start-position=38543 --stop-position=70770 /usr/local/mysql/data/binlog.000002 |mysql -u root -pmM13137276827_
@@ -671,36 +840,13 @@ show variables like '%log_bin%'  查看是否开启了bin log日志
 
   * 例子：/usr/local/mysql/bin/mysqlbinlog  --no-defaults /usr/local/mysql/data/mysql-bin.000001 | mysql -u root -p tuling  (指定恢复全部tuling数据库)
 
-#### binlog恢复数据
+### Relay Log
 
-* 查询是否开启binlog记录功能
-  show variables like 'log_bin'
+中继日志，在主从复制的过程中复制的从主机拷贝看过来的主机上的binlog，由**服务器层**实现
 
-* 查看日志存储地址
+### Slow Query Log
 
-  Show variables like 'log_bin_basename'
-
-* 查看最新日志文件名称
-  Show master status
-
-* 查看此时的binlog日志记录
-  show binlog events in 'bingo.000002'
-
-### Redo Log 
-
-重做日志（物理日志）
-
-redo log是引擎层实现的
-
-### Undo Log
-
-undo log也是由引擎层来实现的
-
-### Bin和Redo log之间的区别
-
-逻辑日志记录的是整个的运算的逻辑过程，物理日志记录的是最后的结果
-
-### slow-query-log
+慢查询日志，记录超过指定查询事件的SQL，由**服务器**层实现
 
 * 什么是慢查询日志
   当查询超过一定时间没有返回结果的时候，才会记录进慢查询日志
@@ -734,16 +880,312 @@ undo log也是由引擎层来实现的
     SHOW VARIABLES LIKE '%slow%';
     ```
 
+### Error Log
+
+错误日志，由**服务器**层实现
+
+### 其他
+
+#### Bin和Redo log之间的区别
+
+逻辑日志记录的是整个的运算的逻辑过程，物理日志记录的是最后的结果
+
 ## Crash-Safe
 
 两阶段提交利用了redo-log和bin-log，正是两阶段提交保证了mysql的Crash-Safe的能力
 
 
 
-
 ## Mysql优化
 
-### Mysql阿里巴巴规范
+### 参数优化
+
+#### binlog日志
+
+* [**log_bin**](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_log_bin) = off|on
+
+  Whether the binary log is enabled. If the [`--log-bin`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#option_mysqld_log-bin) option is used, then the value of this variable is `ON`; otherwise it is `OFF`. This variable reports only on the status of binary logging (enabled or disabled); it does not actually report the value to which [`--log-bin`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#option_mysqld_log-bin) is set.
+
+* [**log_bin_basename**](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_log_bin_basename) = basename
+
+  Holds the base name and path for the binary log files, which can be set with the [`--log-bin`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#option_mysqld_log-bin) server option. The maximum variable length is 256. In MySQL 5.7, the default base name is the name of the host machine with the suffix `-bin`. The default location is the data directory.
+
+* [**sync_binlog**](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_sync_binlog)
+
+  Controls how often the MySQL server synchronizes the binary log to disk.
+
+  - [`sync_binlog=0`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_sync_binlog): Disables synchronization of the binary log to disk by the MySQL server. Instead, the MySQL server relies on the operating system to flush the binary log to disk from time to time as it does for any other file. This setting provides the best performance, but in the event of a power failure or operating system crash, it is possible that the server has committed transactions that have not been synchronized to the binary log.
+  - [`sync_binlog=1`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_sync_binlog): Enables synchronization of the binary log to disk before transactions are committed. This is the safest setting but can have a negative impact on performance due to the increased number of disk writes. In the event of a power failure or operating system crash, transactions that are missing from the binary log are only in a prepared state. This permits the automatic recovery routine to roll back the transactions, which guarantees that no transaction is lost from the binary log.
+  - [`sync_binlog=N`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_sync_binlog), where *`N`* is a value other than 0 or 1: The binary log is synchronized to disk after `N` binary log commit groups have been collected. In the event of a power failure or operating system crash, it is possible that the server has committed transactions that have not been flushed to the binary log. This setting can have a negative impact on performance due to the increased number of disk writes. A higher value improves performance, but with an increased risk of data loss.
+
+  For the greatest possible durability and consistency in a replication setup that uses `InnoDB` with transactions, use these settings:
+
+  - [`sync_binlog=1`](https://dev.mysql.com/doc/refman/5.7/en/replication-options-binary-log.html#sysvar_sync_binlog).
+  - [`innodb_flush_log_at_trx_commit=1`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit).
+
+* **binlog_format** = STATEMENT|ROW|MIXED
+
+  说明：**日志格式**
+
+  1. STATEMENT模式（SBR）
+
+     每一条会修改数据的sql语句会记录到binlog中。优点是并不需要记录每一条sql语句和每一行的数据变化，减少了binlog日志量，节约IO，提高性能。缺点是在某些情况下会导致master-slave中的数据不一致(如sleep()函数， last_insert_id()，以及user-defined functions(udf)等会出现问题)。
+
+
+    2. ROW模式（RBR）
+    
+       不记录每条sql语句的上下文信息，仅需记录哪条数据被修改了，修改成什么样了。而且不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发无法被正确复制的问题。缺点是会产生大量的日志，尤其是alter table的时候会让日志暴涨。
+
+
+    3. MIXED模式（MBR）
+    
+       以上两种模式的混合使用，一般的复制使用STATEMENT模式保存binlog，对于STATEMENT模式无法复制的操作使用ROW模式保存binlog，MySQL会根据执行的SQL语句选择日志保存方式。
+
+* **Max_binlog_size** = GB/MB
+
+  说明：Max_binlog_size: 1073741824=1G ，**binlog的最大值**，一般设置为512M或1G,一般不能超过1G。此参数不能非常严格控制binlog的大小，特别是在遇到大事务时，而binlog日志又到达了尾部，为了保证事务完整性，不切换日志，把所有sql都写到当前日志。
+
+* **expire_logs_days** = N
+
+  说明:设置**binlog老化日期**；有大致三种情况引发日志切换：binlog大小超过max_binlog_size；手动执行flush logs；重新启动时( MySQL将会new一个新文件用于记录binlog)
+
+* **binlog_cache_size** = MB
+
+  说明：默认大小是37268即32K.根据事务需要调整大小。该参数表示在事务中容纳二进制日志sql语句的缓存大小。二进制日志缓存，是服务器支持事务存储引擎并且服务器启用了二进制日志(-log-bin选项)的前提下为每个客户端分配的内存，是每个client都可以分配设置大小的binlog cache空间。
+
+  
+
+#### slowquerylog日志
+
+* slow_query_log = 0|1
+  说明:**开关慢查询日志**。
+* slow_query_log_file=为存放路径；
+* long_query_time =记录超过的时间，默认为10s。
+
+
+
+#### innodb-redo日志
+
+##### 刷新规则
+
+* **innodb_flush_log_at_trx_commit** = 0｜1｜2
+  通常都取1，默认配置也是1
+  
+  * The default setting of 1 is required for full ACID compliance. Logs are written and flushed to disk at each transaction commit.（事务提交就写入磁盘并刷新，保证了完整的ACID属性）
+  * With a setting of 0, logs are written and flushed to disk once per second. Transactions for which logs have not been flushed can be lost in a crash.（每隔一秒钟写入磁盘并刷新，msyql挂了可能会丢失1S数据）
+  * With a setting of 2, logs are written after each transaction commit and flushed to disk once per second. Transactions for which logs have not been flushed can be lost in a crash.（每次都写入磁盘，但是每隔一秒钟刷新一次，操作系统挂了可能会丢失最多1秒钟的事务）
+  
+  ![](https://img-blog.csdnimg.cn/6a37689c9e16446d831679228f1ddd4c.png)
+  
+* [**innodb_flush_log_at_timeout**](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_log_at_timeout)
+
+  默认1 最大27000
+
+  每秒写入和刷新日志*`N`* 。 [`innodb_flush_log_at_timeout`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_log_at_timeout) 允许增加刷新之间的超时时间，以减少刷新并避免影响二进制日志组提交的性能。默认设置为 [`innodb_flush_log_at_timeout`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_flush_log_at_timeout) 每秒一次。
+
+
+
+#### session/global参数
+
+* join_buffer_size = MB
+
+  One join buffer is allocated for each full join between two tables. For a complex join between several tables for which indexes are not used, multiple join buffers might be necessary.官方建议不要在全局增大这个空间，只在巨量的表，多次join的时候只在session级别设置这个变量
+
+* Sort_Buffer_Size = MB
+  主要是用来加速order by 和group by的速度的。最好也是在session中设定。
+
+  说明:Sort_Buffer_Size 是一个**connection级参数**，每个connection第一次需要使用这个buffer的时候，一次性分配设置的内存。Sort_Buffer_Size 并不是越大越好，由于是connection级的参数，过大的设置+高并发可能会耗尽系统内存资源。官网文档说“On Linux, there are thresholds of 256KB and 2MB where larger values may significantly slow down memory allocation”
+
+* innodb_file_per_table = 0|1
+
+  说明：参数值为1，表示对每张表使用单独的 innoDB 文件
+
+* [innodb_flush_method](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_buffer_pool_load_at_startup)
+
+  * 说明:设置InnoDB同步IO的方式：
+
+    * **O_SYNC** 使每次write等待物理I/O操作完成，包括由write操作引起的文件属性更新所需的I/O。
+      
+    * **O_DSYNC** 使每次write等待物理I/O操作完成，但是如果该写操作并不影响读取刚写入的数据，则不需等待文件属性被更新。
+  
+    * ***O_DIRECT** 每次*读/写操作 都会跳过OS Cache，直接在device上读/写。当应用有自己的缓存机制，那么O_DIRECT更可取，例如MySQL的InnoDB使用Buffer Pool机制。
+  
+      ```text
+      fsync: InnoDB uses the fsync() system call to flush both the data and log files. fsync is the default setting.
+      
+      O_DSYNC: InnoDB uses O_SYNC to open and flush the log files, and fsync() to flush the data files. InnoDB does not use O_DSYNC directly because there have been problems with it on many varieties of Unix.
+      
+      littlesync: This option is used for internal performance testing and is currently unsupported. Use at your own risk.
+      
+      nosync: This option is used for internal performance testing and is currently unsupported. Use at your own risk.
+      
+      O_DIRECT: InnoDB uses O_DIRECT (or directio() on Solaris) to open the data files, and uses fsync() to flush both the data and log files. This option is available on some GNU/Linux versions, FreeBSD, and Solaris.
+      
+      O_DIRECT_NO_FSYNC: InnoDB uses O_DIRECT during flushing I/O, but skips the fsync() system call after each write operation.
+      
+      			Prior to MySQL 5.7.25, this setting is not suitable for file systems such as XFS and EXT4, which require an fsync() system call to synchronize file system metadata changes. If you are not sure whether your file system requires an fsync() system call to synchronize file system metadata changes, use O_DIRECT instead.
+      
+      			As of MySQL 5.7.25, fsync() is called after creating a new file, after increasing file size, and after closing a file, to ensure that file system metadata changes are synchronized. The fsync() system call is still skipped after each write operation.
+      
+      			Data loss is possible if redo log files and data files reside on different storage devices, and an unexpected exit occurs before data file writes are flushed from a device cache that is not battery-backed. If you use or intend to use different storage devices for redo log files and data files, and your data files reside on a device with a cache that is not battery-backed, use O_DIRECT instead.
+      ```
+  
+      [链接](https://zhuanlan.zhihu.com/p/453978775)
+  
+  
+  ![](https://img-blog.csdnimg.cn/img_convert/f3e35edf290ea44770157fd2e738d916.png)
+  
+  * linux中的fsync
+  
+    - **sync** 只是将所有修改过的块缓冲区加入写队列，然后就返回，它并不等待实际写磁盘操作结束。所以调用了sync函数，并不意味着已安全的送到磁盘文件上。通常称为update的系统守护进程会周期性地（一般每隔30秒）调用sync函数。这就保证了定期冲洗内核的块缓冲区。
+  
+    - **fsync** 函数只针对单个文件，只对由文件描述符fd指定的单一文件起作用，并且等待写磁盘操作结束，然后同步返回。fsync不仅会同步更新文件数据，还会同步更新文件的属性（比如atime,mtime等）。fsync可用于数据库这样的应用程序，这种应用程序需要确保将修改过的块立即写到磁盘上。
+      fdatasync的功能与fsync类似，但是仅仅在必要的情况下才会同步metadata，因此可以减少一次IO写操作(因为文件的数据和metadata通常存在硬盘的不同地方)
+  
+      > “fdatasync does not flush modified metadata unless that metadata is needed in order to allow a subsequent data retrieval to be corretly handled.”
+  
+      举例来说，文件的尺寸（st_size）如果变化，是需要立即同步的，否则OS一旦崩溃，即使文件的数据部分已同步，由于metadata没有同步，依然读不到修改的内容。而最后访问时间(atime)/修改时间(mtime)是不需要每次都同步的，只要应用程序对这两个时间戳没有苛刻的要求，基本无伤大雅。
+  
+    - **fdatasync** 当初设计是考虑到有特殊的时候一些基本的元数据比如atime，mtime这些不会对以后读取造成不一致性，因此少了这些元数据的同步可能会在IO性能上有提升。该函数类似于fsync，但它只影响文件的数据部分，如果该写操作并不影响读取刚写入的数据，则不需等待文件属性被更新。
+
+
+
+#### mysql-server参数
+
+* character-set-server = utf8|utf8mb4
+  说明:设定字符集，utf8存3个字节，utf8mb4存4个字节。
+
+* max_connections = xxxx
+  默认值：150
+
+  最小值：1 
+
+  最大值：100000
+  最大连接数，当数据库面对高并发时，这个值需要调节为一个合理的值，才满足业务的并发要求，避免数据库拒绝连接。
+
+  The maximum permitted number of simultaneous client connections. The maximum effective value is the lesser of the effective value of [`open_files_limit`](https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_open_files_limit)` - 810`, and the value actually set for `max_connections`.
+
+* max_user_connections=xxxx
+  设置单个用户的连接数。用来对用户来进行限制 
+
+
+
+#### Innodb引擎
+
+* transaction_isolation = READ-UNCOMMITTED | READ-COMMITTED |REPEATABLE-READ | SERIALIZABLE(全局变量)
+  说明:设定事务隔离级别
+
+  1)未提交读(Read Uncommitted)：允许脏读，也就是可能读取到其他会话中未提交事务修改的数据
+
+  2)提交读(Read Committed)：只能读取到已经提交的数据。Oracle等多数数据库默认都是该级别 (不重复读)
+
+  3)可重复读(Repeated Read)：可重复读。在同一个事务内的查询都是事务开始时刻一致的，InnoDB默认级别。在SQL标准中，该隔离级别消除了不可重复读，但是还存在幻象读
+
+  4)串行读(Serializable)：完全串行化的读，每次读都需要获得表级共享锁，读写相互都会阻塞
+
+* 
+
+* innodb_read_io_threads = xxxx
+
+  | Default Value | `4`  |
+  | :------------ | ---- |
+  | Minimum Value | `1`  |
+  | Maximum Value | `64` |
+
+  The number of I/O threads for read operations in `InnoDB`. Its counterpart for write threads is [`innodb_write_io_threads`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_write_io_threads).
+
+* innodb_write_io_threads = xxx
+  数据库写操作时的线程数，用于并发。
+
+ 
+
+* innodb_file_per_table= 1
+
+  | Default Value | `ON` |
+  | :------------ | ---- |
+
+  When [`innodb_file_per_table`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_file_per_table) is enabled, tables are created in file-per-table tablespaces by default. When disabled, tables are created in the system tablespace by default. 
+
+* innodb_stats_on_metadata={ OFF|on}
+  是否动态收集统计信息，开启时会影响数据库的性能(一般关闭，找个时间手动刷新，或定时刷新）如果为关闭时，需要配置数据库调度任务，定时刷新数据库的统计信息。
+
+ 
+
+* innodb_spin_wait_delay=xxxxx
+  控制CPU的轮询时间间隔，默认是6,配置过低时，任务调度比较频繁，会消耗CPU资源。
+
+  | 默认值              | `6`       |
+  | :------------------ | --------- |
+  | 最小值              | `0`       |
+  | 最大值（64 位平台） | `2**64-1` |
+  | 最大值（32 位平台） | `2**32-1` |
+
+  [自旋](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_spin)锁 轮询之间的最大延迟 。该机制的底层实现因硬件和操作系统的组合而异，因此延迟不对应于固定的时间间隔。
+
+ 
+
+* innodb_lock_wait_timeout=xxxx
+  控制锁的超时时间，默认为50，这个值要注意，如果有特殊业务确实要耗时较长时，不能配置太短。
+
+  | 默认值 | `50`         |
+  | :----- | ------------ |
+  | 最小值 | `1`          |
+  | 最大值 | `1073741824` |
+  | 单元   | 秒           |
+
+  `InnoDB` [事务](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_transaction)在放弃之前等待[行锁](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_row_lock) 的时间长度（以秒为单位）。默认值为 50 秒。尝试访问被另一个 `InnoDB`事务锁定的行的事务在发出以下错误之前最多等待这么多秒以对该行进行写访问：
+
+  ```terminal
+  ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+  ```
+
+  当发生锁等待超时时，当前语句被 [回滚](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_rollback)（而不是整个事务）。
+
+#### InnoDB缓存池
+
+* innodb_buffer_pool_size
+  是用于设置InnoDB缓存池（InnoDBBufferPool）的大小，会缓冲索引页、数据页、undo页、插入缓冲、自适应哈希索引、innodb存储的锁信息、数字字典信息等。InnoDB缓存池的大小对InnoDB的整体性能影响较大，默认值是128M。
+
+   通过查询show status like 'Innodb_buffer_pool_%'，保证Innodb Buffer Pool的Read命中率越高越好：(Innodb_buffer_pool_read_requests – Innodb_buffer_pool_reads) /Innodb_buffer_pool_read_requests * 100%
+
+* innodb_buffer_pool_instance
+
+  允许多个缓冲池实例，每页根据哈希平均分配到不同缓冲池实例中，减少数据库内部资源竞争，可以提升InnoDB的并发性能。默认值是1，表示InnoDB缓存池被划分为一个区域。一般配置数值<=服务器CPU的个数。
+
+* innodb_additional_mem_pool_size
+  指定InnoDB用于来存储数据字典和其他内部数据的缓存大小，默认值是2M.InnoDB的表个数越多，就应该适当的增加该参数的大小，当过小的时候，MySQL会记录Warning信息到数据库的错误日志中，这时就需要该调整这个参数大小。对于大数据设置16M足够用。
+
+* innodb_log_buffer_size =xxxxx
+  日志缓冲区大小,一般不用设置太大，能存下1秒钟操作的数据日志就行了，mysql默认1秒写一轮询写一次日志到磁盘。
+
+
+
+#### InnoDB缓存池内部结构
+
+* [`innodb_old_blocks_pct`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_old_blocks_pct)
+
+  Specifies the approximate percentage of the `InnoDB` [buffer pool](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_buffer_pool) used for the old block [sublist](https://dev.mysql.com/doc/refman/5.7/en/glossary.html#glos_sublist). The range of values is 5 to 95. The default value is 37 (that is, 3/8 of the pool). Often used in combination with [`innodb_old_blocks_time`](https://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_old_blocks_time).
+
+#### InnoDB缓冲池预热
+
+* innodb_buffer_pool_dump_at_shutdown
+  默认是关的，如果开启参数，停止MySQL服务时，InnoDB缓存中的热数据将会保存到硬盘中。
+
+* innodb_buffer_pool_dump_now
+  默认关闭，如果开启该参数，停止MySQL服务时，以手动方式将InnoDB缓存池中的热数据保存到本地硬盘。
+
+* innodb_buffer_pool_load_now
+  默认关闭，如果开启该参数，启动MySQL服务时，以手动方式将本地硬盘的数据加载到InnoDB缓存池中。
+
+* innodb_buffer_pool_filename
+  如果开启InnoDB预热功能，停止MySQL服务时，MySQL将InnoDB缓存池中的热数据保存在磁盘里ib_buffer_pool文件中，位于数据库根目录下，默认文件名是这个参数的值。
+
+> 只有在正常关闭MySQL服务，或者pkill mysql时，会把热数据dump到内存。**机器宕机或者pkill -9 mysql，是不会dump**。
+
+作者：easfire
+链接：https://zhuanlan.zhihu.com/p/453978775
+
+### 阿里巴巴规范
 
 [原文连接](https://www.jianshu.com/p/4dc9c82f13d5)
 
@@ -810,13 +1252,22 @@ mysql5.7中join type一共有14种，常用的是all, index, range, ref, eq_ref,
 
 ### extra
 
-using where 代表***\*MYSQL服务器层将在存储引擎层返回行以后再应用WHERE过滤条件\****；
+using where 代表**MYSQL服务器层将在存储引擎层返回行以后再应用WHERE过滤条件**；
+
+## 网络通信方式
+
+mysql网络通信方式是**半双工通信**，这样使得连接和断开速度非常的快，但是也有缺点就是一旦一方发送数据另一方只有接收完数据之后才能进行响应，这也就无法完成流量控制
+
+* 涉及的参数
+  max_allowed_pocket
 
 ## Mysql问题
 
 * count(1)、count(*)和count(字段)有什么区别吗？
 
   count(1)和count(*)的速度是相同的，会统计所有的NULL，速度上比count(字段要快)
+
+  **count(*)和count(1)在innodb引擎中做的优化是：查数量的时候选择使用最小的非聚簇索引，因为体积比聚簇索引小的多（当然只能在没有where条件的情况下使用）**
 
   count(字段)如果字段是主键的话，速度是最快的，但是不会统计NULL值
 
@@ -871,6 +1322,36 @@ using where 代表***\*MYSQL服务器层将在存储引擎层返回行以后再�
 
 [比较全面的回答](https://segmentfault.com/a/1190000039713086)
 
+# k8s
+
+## 结构
+
+### Master Node
+
+链接：https://zhuanlan.zhihu.com/p/292081941
+
+* **API Server**。**K8S的请求入口服务**。API Server负责接收K8S所有请求（来自UI界面或者CLI[命令行工具](https://www.zhihu.com/search?q=命令行工具&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"article"%2C"sourceId"%3A"292081941"})），然后，API Server根据用户的具体请求，去通知其他组件干活。
+
+* **Scheduler**。**K8S所有Worker Node的调度器**。当用户要部署服务时，Scheduler会选择最合适的Worker Node（服务器）来部署。
+
+* **Controller Manager**。**K8S所有Worker Node的监控器**。Controller Manager有很多具体的Controller，在文章[Components of Kubernetes Architecture](https://link.zhihu.com/?target=https%3A//medium.com/%40kumargaurav1247/components-of-kubernetes-architecture-6feea4d5c712)中提到的有Node  Controller、Service Controller、Volume Controller等。Controller负责监控和调整在Worker Node上部署的服务的状态，比如用户要求A服务部署2个副本，那么当其中一个服务挂了的时候，Controller会马上调整，让Scheduler再选择一个Worker Node重新部署服务。
+
+* **etcd**。**K8S的存储服务**。[etcd](https://www.zhihu.com/search?q=etcd&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"article"%2C"sourceId"%3A"292081941"})存储了K8S的关键配置和用户配置，K8S中仅API Server才具备读写权限，其他组件必须通过API Server的接口才能读写数据（见[Kubernetes Works Like an Operating System](https://link.zhihu.com/?target=https%3A//thenewstack.io/how-does-kubernetes-work/)）。
+
+### Slave Node
+
+- **Kubelet**。**Worker Node的监视器，以及与Master Node的通讯器**。Kubelet是Master Node安插在Worker Node上的“眼线”，它会定期向Worker Node汇报自己Node上运行的服务的状态，并接受来自Master Node的指示采取调整措施。
+- **Kube-Proxy**。**K8S的网络代理**。私以为称呼为Network-Proxy可能更适合？Kube-Proxy负责Node在K8S的网络通讯、以及对外部网络流量的负载均衡。
+- **Container Runtime**。**Worker Node的运行环境**。即安装了容器化所需的软件环境确保容器化程序能够跑起来，比如Docker Engine。大白话就是帮忙装好了Docker运行环境。
+- **Logging Layer**。**K8S的监控状态收集器**。私以为称呼为Monitor可能更合适？Logging Layer负责采集Node上所有服务的CPU、内存、磁盘、网络等监控项信息。
+- **Add-Ons**。**K8S管理运维Worker Node的插件组件**。有些文章认为Worker Node只有三大组件，不包含Add-On，但笔者认为K8S系统提供了Add-On机制，让用户可以扩展更多定制化功能，是很不错的亮点。
+
+总结来看，**K8S的Master Node具备：请求入口管理（API Server），Worker Node调度（Scheduler），监控和自动调节（Controller Manager），以及存储功能（etcd）；而K8S的Worker Node具备：状态和监控收集（Kubelet），网络和负载均衡（Kube-Proxy）、保障容器化运行环境（Container Runtime）、以及定制化功能（Add-Ons）。**
+
+## k8s网络通信
+
+https://www.zhihu.com/zvideo/1325164415990734848
+
 # MongoDB
 
 ## 特点
@@ -898,7 +1379,144 @@ password:'123',
 
 # Redis
 
-## reids命令
+## 高危操作启示
+
+* 线上线下均不允许使用keys 正则进行检索（测试服除外），要使用scan来代替
+  因为keys *在进行模糊匹配的时候会引发redis锁，造成redis锁住，一方面redis可能因此宕机，另一方面如果redis正在运行则所有的流量都会转到RDS数据库中，使数据库挂掉
+
+## 常见数据类型和分类
+
+### string
+
+* **set**
+
+  set key value
+
+* **get**
+
+  get key
+
+* keys *
+
+  获取全部的key
+
+* exists key
+
+  是否存在某个key
+
+* append key str
+
+  给key对应的字符串后面加上一个str
+
+* strlen key
+
+  获取key对应的字符的长度
+
+* getrange key 0 3
+
+  获得key对应的字符中[0,3]对应的字符串
+
+* incr view
+
+  view对应的数字加1
+
+* decr view
+
+  view对应的数字减1
+
+* incrby view 10
+
+  可以设置步长，指定增量
+
+* decrby view 10
+
+  可以设定步长，指定减量
+
+* setex key 30 "hello"
+
+  设置key的值为hello，30秒后过期
+
+  如果 key 已经存在， SETEX 命令将会替换旧的值。
+
+* ttl key
+
+  查看key的剩余生存时间
+
+* setnx mykey "redis"
+
+  如果mykey不存在则创建mykey，可以配合看门狗实现分布式锁，看门狗的作用，当自己的时间快不够用的时候，看门狗重新设置过期时间
+
+* getset  db mongodb
+
+  如果存在值，获取原来的值返回，并设置新的价值
+
+### list
+
+list的所有的命令都是以l开头的，用的好的话可以当队列（一端进一端出）、栈、阻塞队列来使用
+
+* lpush	list  value
+  将一个或者多个值从列表的左边放进去
+* lpop list
+  从左边弹出一个
+* rpush  list value
+  将一个或者多个值从列表的右边放进去
+* rpop list
+  从右边弹出一个
+* llen list
+  返回list的长度
+* lrem list 1 one(移除列表中的指定个数的字符)
+  从list中移除一个one字符
+* ltrim list 1 2
+  截取列表中的[1,2]
+* lrange list 0 -1
+  可以显示列表中的所有元素
+* lpoplpush srclist deslist
+  从srclist的左边弹出一个到deslist的左边
+
+### hash
+
+| 1    | [HDEL key field1 field2](https://www.runoob.com/redis/hashes-hdel.html) 删除一个或多个哈希表字段 |
+| ---- | ------------------------------------------------------------ |
+| 2    | [HEXISTS key field](https://www.runoob.com/redis/hashes-hexists.html) 查看哈希表 key 中，指定的字段是否存在。 |
+| 3    | [HGET key field](https://www.runoob.com/redis/hashes-hget.html) 获取存储在哈希表中指定字段的值。 |
+| 4    | [HGETALL key](https://www.runoob.com/redis/hashes-hgetall.html) 获取在哈希表中指定 key 的所有字段和值 |
+| 5    | [HINCRBY key field increment](https://www.runoob.com/redis/hashes-hincrby.html) 为哈希表 key 中的指定字段的整数值加上增量 increment 。 |
+| 6    | [HINCRBYFLOAT key field increment](https://www.runoob.com/redis/hashes-hincrbyfloat.html) 为哈希表 key 中的指定字段的浮点数值加上增量 increment 。 |
+| 7    | [HKEYS key](https://www.runoob.com/redis/hashes-hkeys.html) 获取所有哈希表中的字段 |
+| 8    | [HLEN key](https://www.runoob.com/redis/hashes-hlen.html) 获取哈希表中字段的数量 |
+| 9    | [**HMGET key field1 field2**](https://www.runoob.com/redis/hashes-hmget.html) 获取所有给定字段的值 |
+| 10   | [**HMSET key field1 value1 field2 value2** ](https://www.runoob.com/redis/hashes-hmset.html) 同时将多个 field-value (域-值)对设置到哈希表 key 中。<br />HMSET myhash field1 "Hello" field2 "World" |
+| 11   | [HSET key field value](https://www.runoob.com/redis/hashes-hset.html) 将哈希表 key 中的字段 field 的值设为 value 。 |
+| 12   | [HSETNX key field value](https://www.runoob.com/redis/hashes-hsetnx.html) 只有在字段 field 不存在时，设置哈希表字段的值。 |
+| 13   | [HVALS key](https://www.runoob.com/redis/hashes-hvals.html) 获取哈希表中所有值。 |
+| 14   | [HSCAN key cursor [MATCH pattern\] [COUNT count]](https://www.runoob.com/redis/hashes-hscan.html) 迭代哈希表中的键值对。 |
+
+### set
+
+| 1    | [SADD key member1 member2](https://www.runoob.com/redis/sets-sadd.html) 向集合添加一个或多个成员 |
+| ---- | ------------------------------------------------------------ |
+| 2    | [SCARD key](https://www.runoob.com/redis/sets-scard.html) 获取集合的成员数 |
+| 3    | [SDIFF key1 key2](https://www.runoob.com/redis/sets-sdiff.html) 返回第一个集合与其他集合之间的差异。 |
+| 4    | [SDIFFSTORE destination key1 key2](https://www.runoob.com/redis/sets-sdiffstore.html) 返回给定所有集合的差集并存储在 destination 中 |
+| 5    | [SINTER key1 key2](https://www.runoob.com/redis/sets-sinter.html) 返回给定所有集合的交集 |
+| 6    | [SINTERSTORE destination key1 key2](https://www.runoob.com/redis/sets-sinterstore.html) 返回给定所有集合的交集并存储在 destination 中 |
+| 7    | [SISMEMBER key member](https://www.runoob.com/redis/sets-sismember.html) 判断 member 元素是否是集合 key 的成员 |
+| 8    | [**SMEMBERS** key](https://www.runoob.com/redis/sets-smembers.html) 返回集合中的所有成员 |
+| 9    | [SMOVE source destination member](https://www.runoob.com/redis/sets-smove.html) 将 member 元素从 source 集合移动到 destination 集合 |
+| 10   | [SPOP key](https://www.runoob.com/redis/sets-spop.html) 移除并返回集合中的一个随机元素 |
+| 11   | [SRANDMEMBER key count](https://www.runoob.com/redis/sets-srandmember.html) 返回集合中一个或多个随机数 |
+| 12   | [SREM key member1 member2](https://www.runoob.com/redis/sets-srem.html) 移除集合中一个或多个成员 |
+| 13   | [SUNION key1 key2](https://www.runoob.com/redis/sets-sunion.html) 返回所有给定集合的并集 |
+| 14   | [SUNIONSTORE destination key1 key2](https://www.runoob.com/redis/sets-sunionstore.html) 所有给定集合的并集存储在 destination 集合中 |
+| 15   | [SSCAN key cursor [MATCH pattern\] [COUNT count]](https://www.runoob.com/redis/sets-sscan.html) |
+
+### zset
+
+### bitmap
+
+### hyperloglog
+
+### 地理坐标
 
 * hget key
   获得key对应的value
@@ -909,6 +1527,11 @@ password:'123',
 
 * Evalsha 脚本命令
   https://www.runoob.com/redis/scripting-evalsha.html
+
+### 控制信息
+
+* info
+  看到所有库的key数量，并显示当前redis的状态
 
 ## 为什么那么快
 
@@ -2281,11 +2904,105 @@ delete[] 和free p（数组）如何知道数组的长度的？在申请这些�
 | &&               | 2      |
 | \|\|             | 1      |
 
+单目>运算>逻辑and>逻辑or
 
+## 进制
 
+八进制、十进制、十六进制
 
+```
+// 十进制
+	var a int = 10
+	fmt.Printf("%d \n", a)  // 10
+	fmt.Printf("%b \n", a)  // 1010  占位符%b表示二进制
+ 
+	// 八进制  以0开头
+	var b int = 077
+	fmt.Printf("%o \n", b)  // 77
+ 
+	// 十六进制  以0x开头
+	var c int = 0xff
+	fmt.Printf("%x \n", c)  // ff
+	fmt.Printf("%X \n", c)  // FF
+ 
+	// 二进制不能直接去表示
+
+```
+
+## 格式化输出
+
+%T表示输出变量的类型
+
+%v表示按照默认格式输出
+
+%+v输出结构体的时候会增加字段名字
+
+%b    表示为二进制 
+
+%c    该值对应的unicode码值 
+
+%d    表示为十进制 
+
+%o    表示为八进制 
+
+%q    该值对应的单引号括起来的go语法字符字面值，必要时会采用安全的转义表示 
+
+%x    表示为十六进制，使用a-f 
+
+%X    表示为十六进制，使用A-F 
+
+%U    表示为Unicode格式：U+1234，等价于"U+%04X"
+
+## xorm
+
+* 软删除
+
+  ```Go
+  type User struct {
+      Id int64
+      Name string
+      DeletedAt time.Time `xorm:"deleted"`
+  }
+  ```
+
+  在Delete()时，deleted标记的字段将会被自动更新为当前时间而不是去删除该条记录，如下所示：
+
+  ```Go
+  var user User
+  engine.Id(1).Get(&user)
+  // SELECT * FROM user WHERE id = ?
+  engine.Id(1).Delete(&user)
+  // UPDATE user SET ..., deleted_at = ? WHERE id = ?
+  engine.Id(1).Get(&user)
+  // 再次调用Get，此时将返回false, nil，即记录不存在
+  engine.Id(1).Delete(&user)
+  // 再次调用删除会返回0, nil，即记录不存在
+  ```
+
+* 硬删除
+
+  ```Go
+  engine.Id(1).Unscoped().Get(&user)//硬删除，普通的调用delete是软删除并非真正的删除
+  ```
+
+## GC
+
+* [go ballast](https://cloud.tencent.com/developer/article/1903097?from=article.detail.1900650)超大数组实现达到特定内存值触法GC
+  目前go 1.19已经通过SetMemoryLimit设置内存上限来解决了
+
+## Doc
+
+(1) https://www.bookstack.cn/read/qcrao-Go-Questions/README.md
 
 # Git
+
+## [更新git软件版本的方法](https://blog.csdn.net/Ezreal_King/article/details/79999131)
+
+sudo add-apt-repository ppa:git-core/ppa
+
+sudo apt-get update
+
+sudo apt-get install git
 
 ## [游戏地址](https://learngitbranching.js.org/?locale=zh_CN)
 
@@ -2499,6 +3216,14 @@ warning: adding embedded git repository: src/gopkg.in/yaml.v3
 
 ## HEAD^与HEAD~
 
+HEAD~表示某个提交分支往上的第几个提交
+
+HEAD^表示第几个父提交
+
+也可以~^综合使用，从二可以在提交上游走
+
+[典型示例](https://blog.csdn.net/fly_zxy/article/details/82593842)
+
 ## origin master与origin/master
 
 * origin master 代表远程分支如
@@ -2516,6 +3241,23 @@ git reset --hard origin/master
 git pull
 ```
 
+## tag
+
+* 加本地tag
+
+​		git tag tagname -m "xxxxcommit"
+
+* 删除本地tag
+
+  git tag -d tagname
+
+* 将tag推至远程服务器上
+
+​		git push origin tagname
+
+* 删除远程服务器的tag
+  git push origin  :refs/tags/tag-name
+
 
 
 # 操作系统
@@ -2531,6 +3273,27 @@ git pull
 [图解说明](https://zhuanlan.zhihu.com/p/215231969)
 
 # Linux
+
+## ssh
+
+1. 实现免密登陆
+1.1 rsa 文件生成
+如果你~/.ssh目录下面有 id_rsa 和 id_rsa.pub公钥、私钥两个文件，可以跳过此步骤
+
+使用ssh-keygen命令来生成rsa秘钥文件到~/.ssh目录下
+
+$ ssh-keygen -t rsa
+你可以到~/.ssh目录下查看生成的id_rsa id_rsa.pub两个文件。
+
+1.2 将公钥 rsa.pub 上传到服务器
+使用ssh-copy-id命令将生成的公钥上传到服务器
+
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub username@server -p 22
+1
+ssh-copy-id命令需要提供你服务器的登陆方式和用户密码。
+————————————————
+版权声明：本文为CSDN博主「苏铎」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/u014568993/article/details/84308268
 
 ## vi
 
@@ -2646,7 +3409,26 @@ git pull
   * ctrl+b
     屏幕向上范爷
 
-  
+
+
+## awk
+
+* 使用awk来检索大于某个大小的文件
+  ls -Ral | awk '{if($5 > 100000){print $0 $5 $9}}'
+* ls -alh | awk '{if($7 == 13 && $6 == "Aug" && $9 != "."){print $9}}' | xargs cat | grep "playerid eq"
+
+## xargs
+
+* ls -alh | awk '{if($7 == 13 && $6 == "Aug" && $9 != "."){print $9}}' | xargs cat | grep "playerid eq"
+  筛选所有的8月13号更新的log中的带有“playerid eq”字符的行
+
+## grep
+
+Grep PLAYLOG stderr.log | grep "Room(225)" 二次过滤
+
+## tail
+
+tail -f stderr.log 动态更新显示stderr.log
 
 ## shell
 
@@ -2679,9 +3461,15 @@ git pull
   | ${变量%关键词} ${变量%%关键词}                       | 若变量内容从尾向前的数据符合『关键词』，则将符合的最短数据删除 若变量内容从尾向前的数据符合『关键词』，则将符合的最长数据删除 |
   | ${变量/旧字符串/新字符串} ${变量//旧字符串/新字符串} | 若变量内容符合『旧字符串』则『第一个旧字符串会被新字符串取代』 若变量内容符合『旧字符串』则『全部的旧字符串会被新字符串取代』 |
 
-## 文件结构
+## 资源
+
+### 文件结构
 
 ![目录树相关性示意图](http://cn.linux.vbird.org/linux_basic/0130designlinux_files/dirtree.gif)
+
+### 文件资源
+
+* ulimit -n 显示当前用户可以打开的最大的文件数量
 
 ## 系统配置
 
@@ -2870,6 +3658,18 @@ printf(...)
 * 运维工具
   * 远程运维工具 fabric
     https://fabric-chs.readthedocs.io/zh_CN/chs/tutorial.html
+
+* 
+
+  
+  
+  
+  
+  
+  
+  
+  
+
 
 # 问题
 
