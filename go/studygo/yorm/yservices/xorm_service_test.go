@@ -35,8 +35,6 @@ func TestInsert(t *testing.T) {
 		r.TimerEntrust = time.After(5 * time.Second)
 		fmt.Println("end")
 	}()
-	for {
-	}
 
 }
 
@@ -50,6 +48,20 @@ func TestUseYorm(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			UseYorm()
+		})
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		{name: "测试更新"},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			Update()
 		})
 	}
 }

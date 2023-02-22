@@ -22,6 +22,27 @@ func RWMutexWork1() {
 	sa.rw.Lock()
 }
 
+var slock sync.RWMutex
+
+func RWMutexUnlockOnly() {
+
+	var a, b int
+	a = b + 1
+	if a > b {
+		fmt.Println("不会跑defer 语句")
+		return
+	}
+	defer func() {
+		fmt.Println("这里会调用defer的unlock")
+		slock.Unlock()
+	}()
+}
+
+func RWMutexLockUnlock() {
+	defer slock.Unlock()
+	slock.Lock()
+}
+
 func RWMutexWork2() {
 	//测试写锁
 

@@ -2,9 +2,58 @@ package yservices
 
 import (
 	"fmt"
+	"strconv"
 	"studygo/yorm/ydaos"
 	"time"
 )
+
+func updateRows() {
+	svc := NewSvc()
+	defer svc.Close()
+	session := svc.GetDaos().GetDb()
+
+	var list []ydaos.User
+	for i := 0; i < 50; i++ {
+		list = append(list, ydaos.User{
+			Id:   0,
+			Uid:  int64(100 + i),
+			Name: "xuyongkang",
+		})
+	}
+
+	insert, err := session.Insert(&list)
+	if err != nil {
+		fmt.Println("err", err)
+		return
+	}
+
+	fmt.Println("updateRows insert", insert)
+
+	list = make([]ydaos.User, 0)
+	err = session.Where("name=?", "xuyongkang").Find(&list)
+	if err != nil {
+		fmt.Println("find err", err)
+		return
+	}
+	fmt.Println(list)
+
+	for i := 0; i < 50; i++ {
+		list[i].Name = "xuyongqing" + strconv.Itoa(i)
+	}
+
+	finalUpdate := 0
+	for _, v := range list {
+		update, err := session.Where("uid=?", v.Uid).Cols("name").Update(ydaos.User{Name: "xuyongqing"})
+		if err != nil {
+			fmt.Println("update err", update, err)
+			return
+		}
+		finalUpdate++
+	}
+
+	fmt.Println("updateRows update", finalUpdate)
+
+}
 
 func Update1() {
 	svc := NewSvc()

@@ -46,7 +46,8 @@ func Delete() {
 }
 
 func Update() {
-	UpdateNoAutoTime()
+	//UpdateNoAutoTime()
+	updateRows()
 }
 
 func Create() {
