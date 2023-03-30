@@ -35,6 +35,8 @@ type LoveBird struct {
 }
 
 func playGround() {
+
+	//多态
 	var angryBird1 AngryBird = AngryBird{name: "red"}
 	var i interface{} = angryBird1
 
@@ -46,12 +48,18 @@ func playGround() {
 		swimmer.swimming()
 	}
 
+	//赋值
 	var swimmer Swimmer = AngryBird{name: "blue"}
 
 	swimmerAccepter(swimmer)
 
-	//test LoveBird
+	var angryBird AngryBird = AngryBird{name: "angryBird"}
 
+	swimmerAccepter(angryBird) //经过函数参数的时候，会发生类型转换，但是携带的类型信息和变量不会丢失
+
+	//panic
 	var loveBird LoveBird
+
 	swimmerAccepter(loveBird) //含有这个类型但是调用没有实现的方法会panic
+
 }

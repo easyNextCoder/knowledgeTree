@@ -1,6 +1,7 @@
 package xjson
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -9,9 +10,19 @@ type Inn struct {
 	Second int `json:"second"`
 }
 
+type InnOtherName struct {
+	First  int `json:"firs"`
+	Second int `json:"second"`
+}
+
 type Ginh struct {
 	Hello string `json:"hello"`
 	Arr   []*Inn `json:"arr"`
+}
+
+type GinhOtherName struct {
+	Hello string          `json:"hello"`
+	Arr   []*InnOtherName `json:"arr"`
 }
 
 func ginWork() {
@@ -29,19 +40,19 @@ func ginWork() {
 		},
 	}
 
-	gg := 1 //gin.H{"Xval": g}
+	bytes, err := json.Marshal(&g)
+	if err != nil {
+		return
+	}
 
-	//bytes, err := 1, 2//json.Marshal(gg)
-	//if err != 1 {
-	//	return
-	//}
+	var pp GinhOtherName
+	err = json.Unmarshal(bytes, &pp)
+	if err != nil {
+		return
+	}
 
-	//var val Ginh
-	//err = json.Unmarshal(bytes, &val)
-	//if err != nil {
-	//	return
-	//}
+	//v := pp["Xval"].(Ginh)
 
-	fmt.Println(gg, g)
+	fmt.Println(g, pp, pp.Hello, pp.Arr, pp.Arr[0], pp.Arr[1])
 
 }

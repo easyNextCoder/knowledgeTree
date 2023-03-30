@@ -4,8 +4,32 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"sync"
+	"time"
 )
+
+/// gRander need lock() and defer unlock
+var randMutex = sync.Mutex{}
+var gRander = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+/**
+rand [min,max)
+*/
+func RandRange(i, j int) int {
+	min := i
+	max := j
+	if min > max {
+		min, max = max, min
+	}
+	if (max - min) <= 0 {
+		panic("invalid argument to randrange max cant equal min")
+	}
+	randMutex.Lock()
+	rand := gRander.Intn(max-min) + min
+	randMutex.Unlock()
+	return rand
+}
 
 func Rpc(ctx context.Context, url string) error {
 	result := make(chan int)
@@ -15,7 +39,7 @@ func Rpc(ctx context.Context, url string) error {
 		// 进行RPC调用，并且返回是否成功，成功通过result传递成功信息，错误通过error传递错误信息
 		isSuccess := true
 
-		if xrandom.RandRange(0, 2) > 0 {
+		if RandRange(0, 100) > 50 {
 			isSuccess = false
 		}
 
@@ -25,7 +49,7 @@ func Rpc(ctx context.Context, url string) error {
 			err <- errors.New("some error happen")
 		}
 	}()
-	fmt.Println("阻塞之前！")
+
 	select {
 	case <-ctx.Done():
 		// 其他RPC调用调用失败

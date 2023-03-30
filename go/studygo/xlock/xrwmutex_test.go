@@ -85,3 +85,17 @@ func TestRWMutexLockUnlock(t *testing.T) {
 		})
 	}
 }
+
+func TestWaitLock(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		// TODO: Add test cases.
+		{name: "测试一个go程锁定，另一个会等待，等待之后再次运行"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			WaitLock()
+		})
+	}
+}

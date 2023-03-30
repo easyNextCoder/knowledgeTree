@@ -61,24 +61,28 @@ type XPeople struct {
 	v [10]int
 }
 
-func (s XPeople) changev() {
+func (s XPeople) changev() { //变量作为reciever，会发生拷贝，在函数内部改变拷贝产生的变量，原结构内容不会发生变化
 	s.v[1] = 999
 	fmt.Println(s)
 }
 
-func (s *XPeople) pchangev() {
+func (s *XPeople) pchangev() { //指针作为reciever，拷贝指针，改变原结构内部变量更容易
 	s.v[1] = 999
 	fmt.Println(s)
 }
 
 func useVarAsReceiver() {
 	var p XPeople = XPeople{}
+	pp := &p
+	pp.changev()
 	p.changev()
 	fmt.Println(p)
 }
 func usePointerAsReceiver() {
 	var p XPeople = XPeople{}
+	pp := &p
 	p.pchangev()
+	pp.pchangev()
 	fmt.Println(p)
 
 }

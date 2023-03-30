@@ -105,6 +105,10 @@ func playWithInterface(cat interface{}) {
 		fmt.Println("type is *S")
 	case **S:
 		fmt.Println("type is **S")
+	case *interface{}:
+		fmt.Println("type is *interface{}")
+	case interface{}:
+		fmt.Println("type is *interface{}")
 	default:
 		fmt.Println("enter default")
 	}
@@ -120,8 +124,6 @@ func typeConvertWork() {
 
 	var i interface{} = S{}
 	var nilCat Cat
-	var sd S
-	var sdp *S
 
 	//var cat Cat = RedCat{} //值拷贝
 	var cat Cat = &RedCat{} //pointer拷贝
@@ -133,61 +135,67 @@ func typeConvertWork() {
 
 	//playWithCat(i)
 	//playWithFourFoot(i)
-	playWithInterface(i)
+	playWithInterface(i) //type S
 
 	//playWithCat(&i)
 	//playWithFourFoot(&i)
-	playWithInterface(&i)
+	playWithInterface(&i) //type *interface{} (取地址操作再赋值给interface{}，会覆盖之前interface中存的类型)
 
-	playWithCat(nilCat)
+	playWithCat(nil)       //type nil
+	playWithFourFoot(nil)  //type nil
+	playWithInterface(nil) //type nil
+
+	playWithCat(nilCat) //type nil
 	//playWithFourFoot(nilCat)
-	playWithInterface(nilCat)
+	playWithInterface(nilCat) //type nil
 
-	playWithCat(cat)
+	playWithCat(cat) //type Cat
 	//playWithFourFoot(cat)
-	playWithInterface(cat)
+	playWithInterface(cat) //type *RedCat
 
 	//playWithCat(catP)
 	//playWithFourFoot(catP)
-	playWithInterface(catP)
+	playWithInterface(catP) //input type &(Cat类型的空接口)  type *Cat
 
 	//playWithCat(&cat)
 	//playWithFourFoot(&cat)
-	playWithInterface(&cat)
+	playWithInterface(&cat) //type *Cat (取地址操作再赋值给interface{}，会覆盖之前interface中存的类型)
 
-	playWithCat(redCat)
-	playWithFourFoot(redCat)
-	playWithInterface(redCat)
+	playWithCat(redCat)       //type Cat
+	playWithFourFoot(redCat)  //type Cat
+	playWithInterface(redCat) //type Cat
 
-	playWithCat(&redCat)
-	playWithFourFoot(&redCat)
+	playWithCat(&redCat)       //自身被赋值给了函数的参数，所以在内部的判断类型是redCat
+	playWithFourFoot(&redCat)  //自身被赋值给了函数的参数，所以在内部的判断类型是redCat
 	playWithInterface(&redCat) //&redCat即是*redCat类型也是Cat型
 	v := &redCat
-	playWithInterface(&v) //15
+	playWithInterface(&v) //type **RedCat
 
-	playWithCat(redCatP)
-	playWithFourFoot(redCatP)
-	playWithInterface(redCatP)
+	playWithCat(redCatP)       //Cat
+	playWithFourFoot(redCatP)  //type Cat
+	playWithInterface(redCatP) //type *RedCat
 
+	var sd S
+	var sdp *S
 	//playWithCat(S{})
 	//playWithFourFoot(S{})
-	playWithInterface(S{})
+	playWithInterface(S{}) //type S
 
 	//playWithCat(sd)
 	//playWithFourFoot(sd)
-	playWithInterface(sd)
+	playWithInterface(sd) //type S
 
 	//playWithCat(&sd)
 	//playWithFourFoot(&sd)
-	playWithInterface(&sd)
+	playWithInterface(&sd) //type *S
 
 	//playWithCat(sdp)
 	//playWithFourFoot(sdp)
-	playWithInterface(sdp)
+	playWithInterface(sdp) //type *S
 
 	//playWithCat(&sdp)
 	//playWithFourFoot(&sdp)
-	playWithInterface(&sdp)
+	playWithInterface(&sdp) //type **S
 
 	fmt.Println("------------------end")
 

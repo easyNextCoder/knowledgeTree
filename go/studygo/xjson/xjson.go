@@ -88,3 +88,30 @@ func nestStructMarshalWork() {
 	fmt.Printf("unmarshalObj(%+v)", unmarshalObj.MaxProj)
 
 }
+
+type (
+	StructA struct {
+		Used bool `json:"used"`
+	}
+	StructB struct {
+		UnUsed bool `json:"un_used"`
+	}
+)
+
+func unmarshalToDifferentType() {
+	var a StructA = StructA{Used: true}
+	var b StructB
+
+	bytes, err := json.Marshal(&a)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(bytes, &b)
+	if err != nil {
+		fmt.Println("this is err")
+		return
+	}
+
+	fmt.Printf("%+v", b)
+}

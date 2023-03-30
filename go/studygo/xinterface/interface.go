@@ -39,6 +39,7 @@ func workOnChangeInterface() {
 }
 
 //新
+
 type xCommandRsp interface {
 	Work()
 }

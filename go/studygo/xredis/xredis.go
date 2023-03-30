@@ -444,8 +444,8 @@ func stringOperate() {
 	}
 	fmt.Println("set", do, string(do.([]byte)))
 
-	//setex
-	conn.Do(setex, "setex_key", 3, "setex_val")
+	//setex Redis Setex 命令为指定的 key 设置值及其过期时间。如果 key 已经存在， SETEX 命令将会替换旧的值。
+	conn.Do(setex, "setex_key", 3, "setex_val") //3
 	do, err = conn.Do(get, "setex_key")
 	if err != nil {
 		return

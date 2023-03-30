@@ -1,9 +1,10 @@
 
-//参考地址
-//https://www.cnblogs.com/l-uz/p/16290572.html
-//https://blog.csdn.net/Eric_aixiansen/article/details/127777322
-//https://pkg.go.dev/github.com/gomodule/redigo/redis
-//https://www.cnblogs.com/throwable/p/11644790.html
+>参考地址
+> 
+>https://www.cnblogs.com/l-uz/p/16290572.html
+>https://blog.csdn.net/Eric_aixiansen/article/details/127777322
+>https://pkg.go.dev/github.com/gomodule/redigo/redis
+>https://www.cnblogs.com/throwable/p/11644790.html
 
 ## redis的通信协议RESP支持的数据类型
 

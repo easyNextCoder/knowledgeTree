@@ -99,3 +99,16 @@ func makeAndLiteralAlloc() {
 	}
 
 }
+
+func appendInRange() {
+	var a []int = []int{1, 2, 3}
+	for i := 0; i < len(a); i++ {
+		v := a[i]
+		if v == 3 {
+			a = append(a, 4)
+			fmt.Println("we append")
+		}
+		fmt.Println(i, v)
+	}
+
+}

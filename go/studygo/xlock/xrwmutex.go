@@ -3,6 +3,7 @@ package xlock
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 type RWMutexSource struct {
@@ -95,4 +96,32 @@ func RWMutexWork3() {
 		}()
 	}
 	sw.Wait()
+}
+
+func WaitLock() {
+	var l sync.RWMutex
+	sg := sync.WaitGroup{}
+	sg.Add(1)
+	time.AfterFunc(time.Second*1, func() {
+
+		go func() {
+			defer l.Unlock()
+			l.Lock()
+			fmt.Println("later")
+			sg.Done()
+		}()
+	})
+
+	sg.Add(1)
+	go func() {
+		defer l.Unlock()
+		l.Lock()
+		fmt.Println("first sleep")
+		time.Sleep(3 * time.Second)
+		fmt.Println("first sleep done")
+		sg.Done()
+	}()
+
+	sg.Wait()
+	fmt.Println("final done!")
 }
