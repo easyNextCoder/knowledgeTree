@@ -11,10 +11,6 @@ var LogLevel int = -100
 var LogLevelN1 = -1
 var LogLevelN100 = -100
 
-//func log(s string, i ...interface{}) {
-//	//fmt.Printf(s, i...)
-//}
-
 func llog(ll int, s string, i ...interface{}) {
 	if ll <= LogLevel {
 		fmt.Printf(s, i...)

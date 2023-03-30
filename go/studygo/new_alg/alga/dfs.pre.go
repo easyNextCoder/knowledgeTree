@@ -35,13 +35,10 @@ func (self *AlgX) findAllFlush() {
 	////fmt.Println("sorted cards before ", self.hand_cards)
 
 	var cards [30]Card
-	//fmt.Println(self.hand_cards)
 	for i := 0; i < len(self.hand_cards); i++ {
-		//fmt.Println(i)
 		if self.flushCardsLen[self.flushLen] == 0 {
 			cards[self.flushCardsLen[self.flushLen]] = self.hand_cards[i]
 			self.flushCardsLen[self.flushLen]++
-			//cards = append(cards, self.hand_cards[i])
 		} else {
 			if /*(self.hand_cards[i].first == cards[len(cards)-1].first+1 || self.hand_cards[i].first == cards[len(cards)-1].first) && */ self.hand_cards[i].Second == cards[self.flushCardsLen[self.flushLen]-1].Second {
 				cards[self.flushCardsLen[self.flushLen]] = self.hand_cards[i]
@@ -57,13 +54,6 @@ func (self *AlgX) findAllFlush() {
 							self.states[CARD_OFFSET(&c)][0]++
 						}
 					}
-
-					//for _, c := range cards {
-					//	if self.recordUsed[CARD_OFFSET(&c)] {
-					//
-					//		self.states[CARD_OFFSET(&c)][0]++
-					//	}
-					//}
 
 					self.flushCards[self.flushLen] = cards
 					self.flushLen++

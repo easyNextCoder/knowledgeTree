@@ -53,28 +53,13 @@ func (self *AlgX) searchBombWork(cardsIndex int, jokerNum int) ([3]Project, int)
 		}
 	}
 
-	//sort.Slice(cards, func(i, j int) bool {
-	//	if cards[i].second == cards[j].second {
-	//		return cards[i].first < cards[j].first
-	//	} else if cards[i].second < cards[j].second {
-	//		return true
-	//	}
-	//	return false
-	//})
-
 	cardVal := self.bombCards[cardsIndex][0].First
-	//llog(-1, "bombColorFreq %v %d\n", colorFreq, cardVal)
-	//fmt.Println("search Bomb mp", colorFreq, cardVal)
 
 	if cnt == 8 {
 		var a, b Project
 		NewBombProjectAllInit(&a, cardVal)
 		NewBombProjectAllInit(&b, cardVal)
 
-		//e := []Card{{cardVal, 1}, {cardVal, 2}, {cardVal, 3}, {cardVal, 4}}
-		//f := []Card{{cardVal, 1}, {cardVal, 2}, {cardVal, 3}, {cardVal, 4}}
-		//cc = append(cc, e)
-		//cc = append(cc, f)
 		return [3]Project{a, b}, 2
 	}
 	//llog(-100, "searchBomb colorCnt %d cnt %d colorFreq %v cardVal %v cards %v\n", colorCnt, cnt, colorFreq, cardVal, cards)

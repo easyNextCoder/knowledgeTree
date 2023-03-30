@@ -1,5 +1,38 @@
 package alga
 
+type AlgX struct {
+	hand_cards                        Deck
+	jokerLeft                         int
+	jokerNum                          int
+	addJokerToColumn                  int
+	haveProcessedInOneJokerMiddleNode bool
+
+	tmpFlushs Projects
+	xy        XY      //牌的坐标
+	lastXy    XY      //牌的上次的坐标
+	cardsXY   [72]int //所有牌的分布
+	freq      [72]int
+
+	need        [80]int    //make(map[int16]int, 0)
+	needid      [80][3]int //make(map[int16]int, 0)
+	needidIndex [80]int
+
+	states                        [60][2]int16 //[0]代表给顺子[1]代表给炸弹
+	bombCards                     [15][9]Card
+	bombCardsLen                  [15]int
+	bombLen                       int
+	flushCards                    [5][30]Card
+	flushCardsLen                 [5]int
+	flushLen                      int
+	recordUsed                    [60]bool
+	bombRepeatMap                 [15]Bomb
+	bombTakeAheadMaxScoreProjects Projects
+	tmpMaxScoreProjects           Projects
+	maxScoreProjects              Projects
+	tmpMaxLenProjects             Projects
+	maxLenProjects                Projects
+}
+
 func (self *AlgX) Entry(deck Deck, jokerNum int) {
 
 	self.hand_cards = deck
@@ -24,21 +57,6 @@ func (self *AlgX) Entry(deck Deck, jokerNum int) {
 		}
 	}
 
-	//fmt.Println("bomb:", self.hand_cards)
-	//sort.Slice(self.hand_cards, func(i, j int) bool {
-	//	if self.hand_cards[i].First == self.hand_cards[j].First {
-	//		return self.hand_cards[i].Second < self.hand_cards[j].Second
-	//	} else if self.hand_cards[i].First < self.hand_cards[j].First {
-	//		return true
-	//	}
-	//	return false
-	//})
-
-	//self.states = make([][2]int16, 60) //[0]代表顺子，全部给顺子
-	//self.bombCards = [15][]Card{}
-	//self.flushCards = [5][]Card{}
-	//self.recordUsed = [60]bool{}
-	//self.bombRepeatMap = [15]Bomb{}
 	self.bombTakeAheadMaxScoreProjects = Projects{}
 
 	self.tmpMaxScoreProjects = Projects{}
@@ -47,9 +65,6 @@ func (self *AlgX) Entry(deck Deck, jokerNum int) {
 	self.maxLenProjects = Projects{}
 
 	self.tmpFlushs = Projects{}
-
-	//self.cardsXY = make([]int, 72)
-	//self.freq = make([]int, 72)
 
 	self.findAllBomb()
 
@@ -74,21 +89,8 @@ func (self *AlgX) Entry(deck Deck, jokerNum int) {
 
 	self.findAllFlush()
 
-	//fmt.Printf("flushCards %v\n\n bombCards %v\n\n", self.flushCards, self.bombCards)
-	//self.jokerLeft = 0
 	self.jokerNum = self.jokerLeft
 
-	//if self.jokerNum == 2 { //这里要进行所有牌抽出单张+2张joker凑成炸弹的预先计算
-	//	self.handTwoJokerFirstNode()
-	//}
-
 	self.dfs(0)
-
-	//self.cardsXY = nil
-	//self.freq = nil
-	//self.states = nil
-	//self.bombTakeAheadMaxScoreProjects.projs = nil
-	//return &self.maxScoreProjects, &self.maxLenProjects, self.dfsTimes
-	//llog(LogLevelN100, "handleOneJoker final maxScoreProject %v ", maxScoreProjects)
 
 }
