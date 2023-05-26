@@ -42,3 +42,5 @@ func interfaceWorkWrapper() {
 	//xi := x.(int)
 	//fmt.Println(xi)
 }
+
+//only for test
