@@ -53,6 +53,14 @@ func updateRows() {
 
 	fmt.Println("updateRows update", finalUpdate)
 
+	list2 := make([]ydaos.User, 0)
+	err = session.Where("uid=?", 105).Find(&list2)
+	if err != nil {
+		fmt.Println("find err", err)
+		return
+	}
+	fmt.Println("list2 is:", list2)
+
 }
 
 func Update1() {

@@ -17,7 +17,6 @@ func mutexWork() {
 
 	mutex.Lock()
 	mutex.Lock()
-
 }
 
 var sa MutexSource

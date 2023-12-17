@@ -5,7 +5,7 @@ import (
 	"studygo/yorm/ydaos"
 )
 
-func DeleteAll() {
+func DeleteAll() error {
 	svc := NewSvc()
 	defer svc.Close()
 	session := svc.GetDaos().GetDb()
@@ -16,8 +16,7 @@ func DeleteAll() {
 	err := session.SQL(deleteSql).Find(&res) //不加find是不会执行这个sql语句的,但是直接Query的时候会执行sql语句
 	lastSql, _ := session.LastSQL()
 	if err != nil {
-		fmt.Println("DeleteAll err", err, "lastSql ", lastSql)
-		return
+		return err
 	}
 
 	fmt.Println("delete all lastsql", lastSql)
@@ -27,12 +26,12 @@ func DeleteAll() {
 	err1 := session.SQL(deleteUserSql).Find(&res2)
 	lastSql, _ = session.LastSQL()
 	if err1 != nil {
-		fmt.Println("DeleteAll err2", err, "lastSql ", lastSql)
-		return
+		return err1
 	}
 
 	fmt.Println("delete all lastsql", lastSql)
 
+	return nil
 }
 
 func Delete1() {
@@ -56,10 +55,20 @@ func Delete1() {
 		}
 	}
 
-	//删除所有的行(⚠️)
-	//affected, err := session.Delete(item)
-	//if err != nil {
-	//	fmt.Println("Test_Delete err", err)
-	//}
-	//fmt.Println("affected rows is %d", affected)
+}
+
+func deleteAll() error {
+	svc := NewSvc()
+	defer svc.Close()
+	session := svc.GetDaos().GetDb()
+
+	item := &ydaos.User{Id: 136}
+
+	deleteNum, err := session.Delete(item)
+	if err != nil {
+		return fmt.Errorf("delete err(%s)", err)
+	}
+
+	fmt.Printf("deleteAll num(%d)", deleteNum)
+	return nil
 }

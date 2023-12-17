@@ -60,3 +60,14 @@ func timeConvert() {
 	fmt.Printf("%d\n", time.Duration(time.Second*1).Nanoseconds())
 	fmt.Printf("%d\n", time.Now().UnixNano())
 }
+
+func nilTimeValue() {
+	var startTime time.Time
+
+	fmt.Printf("nil Time变量的默认值 %+v %d", startTime, startTime.Second())
+}
+
+func timeFormate() {
+	dayStr := time.Now().String()[:10]
+	fmt.Println(dayStr)
+}

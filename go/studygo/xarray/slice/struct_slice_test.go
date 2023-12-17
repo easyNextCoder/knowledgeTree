@@ -41,3 +41,17 @@ func Test_changeInForRange(t *testing.T) {
 		})
 	}
 }
+
+func TestJustAllocNotInitInStruct(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		// TODO: Add test cases.
+		{name: "justAllocNotInit in struct"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			JustAllocNotInitInStruct()
+		})
+	}
+}

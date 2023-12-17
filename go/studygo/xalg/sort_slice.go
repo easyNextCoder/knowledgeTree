@@ -10,34 +10,6 @@ type person struct {
 	age  int
 }
 
-func test() [][]int {
-	fmt.Println("do it")
-	ret := make([][]int, 2)
-	for i, _ := range ret {
-		ret[i] = append(ret[i], 0)
-		ret[i] = append(ret[i], 1)
-		ret[i] = append(ret[i], 2)
-	}
-	return ret
-}
-
-var xt = test()
-
-func worktest2() {
-	fmt.Println(xt)
-	fmt.Println(xt)
-	fmt.Println(xt)
-}
-
-func WorkTest() {
-	fmt.Println(xt)
-	worktest2()
-	a := []int{1, 2, 3, 4}
-	b := a[0:4]
-	fmt.Println("the b res")
-	fmt.Println(b)
-}
-
 func SortSlice() {
 	arrLen := 10
 	arr := make([]*person, 10)
@@ -56,4 +28,26 @@ func SortSlice() {
 
 	fmt.Println(arr[0])
 
+}
+
+func sortSliceWork() {
+	type pair struct {
+		card   int
+		profit int
+		score  int
+	}
+	cp := make([]pair, 0)
+	for _, card := range []int{1, 2, 3} {
+
+		cp = append(cp, pair{card: card, profit: card + 100, score: card})
+	}
+	cp[0].profit = 102
+	sort.Slice(cp, func(i, j int) bool {
+		if cp[i].profit == cp[j].profit {
+			return cp[i].score > cp[j].score
+		} else {
+			return cp[i].profit > cp[j].profit
+		}
+	})
+	fmt.Println(cp)
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head><!-- 引入editor.md相关样式 -->
+<link rel="stylesheet" href="css/editormd.preview.css" />
+<link rel="stylesheet" href="css/editormd.logo.css" />
+<link rel="stylesheet" href="css/editormd.css" />
+
+
+
+<!-- 引入editor.md js文件 -->
+
+<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
+<script src="lib/marked.min.js"></script>
+<script src="lib/flowchart.min.js"></script>
+<script src="lib/jquery.flowchart.min.js"></script>
+<script src="lib/prettify.min.js"></script>
+<script src="lib/raphael.min.js"></script>
+<script src="lib/sequence-diagram.min.js"></script>
+<script src="lib/underscore.min.js"></script>
+<script src="editormd.min.js"></script>
+</head>
+<body>
+<div id="article-md-body" class="article-md-body"></div>
+
+//目录容器
+<div class="pannel article-toc" id="article-toc"></div>
+</body>
+
+<script type="text/javascript">
+
+    function HTMLDecode(text) {
+        var temp = document.createElement("div");
+        temp.innerHTML = text;
+        var output = temp.innerText || temp.textContent;
+        temp = null;
+        return output;
+    }
+    $(function() {
+        var x = `{{contentmd}}`
+            var y = HTMLDecode(x)
+
+        var editor = editormd.markdownToHTML('article-md-body', {
+            markdown: y, //待渲染的markdown文本字符串
+        tocContainer: '#article-toc',	//指定目录容器的id
+            tocDropdown: false,
+            tex                  : true,
+            taskList             : true,   // Github Flavored Markdown task lists
+            emoji                : true,
+            flowChart            : true,
+        });
+    });
+</script>
+</html>
+
+

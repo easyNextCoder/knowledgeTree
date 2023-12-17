@@ -123,3 +123,17 @@ func Test_mapParaToFunc(t *testing.T) {
 	mapParaToFunc()
 
 }
+
+func Test_getWhenAssignMap(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		// TODO: Add test cases.
+		{name: "测试当给map重新赋值的时候访问map"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getWhenAssignMap()
+		})
+	}
+}

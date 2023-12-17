@@ -50,7 +50,7 @@ func lock() { //pass 同步的正确做法
 
 }
 
-func channelAsLockWithCache0() { //pass,达到预期效果
+func channelAsLockWithCache1() { //pass,达到预期效果
 
 	done := make(chan int, 1)
 	go func() {
@@ -84,9 +84,10 @@ func channelAsLock() { //pass
 	done := make(chan int) //如果这个channel 加缓存之后，main就不一定等go程了
 	go func() {
 		fmt.Println("你好，世界")
+		time.Sleep(time.Second)
 		<-done
 	}()
-
+	fmt.Println("main")
 	done <- 1
 }
 
@@ -99,7 +100,7 @@ func channelAsLock2() { //pass
 
 	}()
 
-	fmt.Println("channelAsLock2 main")
+	fmt.Println("main")
 	//done <- 1
 	<-done
 }
@@ -129,6 +130,14 @@ func channelAsLock4() { //deadlock
 	done := make(chan int, 0)
 
 	fmt.Println("channelAsLock3 main")
+	done <- 1
+	<-done
+}
+
+func channelAsLock4_0() { //panic
+	done := make(chan int, 0)
+
+	fmt.Println("channelAsLock4_0 main")
 	done <- 1
 	<-done
 }

@@ -3,6 +3,7 @@ package xjson
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 )
 
 type (
@@ -18,7 +19,7 @@ type (
 )
 
 func jsonWork() {
-	jsonv, _ := json.Marshal(&S{Val: 10000000000000})
+	jsonv, _ := json.Marshal(&S{Val: 13460201})
 	fmt.Println(string(jsonv), jsonv)
 
 	sv := new(SV)
@@ -41,6 +42,14 @@ func jsonWork() {
 
 	ival := int(sv.Val.(float64))
 	fmt.Println(ival)
+
+	tp := reflect.TypeOf(sv.Val)
+	val := reflect.ValueOf(sv.Val)
+	nval := reflect.New(tp)
+	nval.Set(reflect.Value{})
+
+	fmt.Println("反射得到的tp", tp.String(), "反射得到的值", val.Float(), "使用反射重新生成的值", nval)
+
 	//ret := reflect.ValueOf(svp.Val)
 	//fmt.Println(ret.Kind(), ret.Interface())
 

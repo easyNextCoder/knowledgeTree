@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"studygo/yorm/ydaos"
+	"time"
 )
 
 type Svc struct {
@@ -66,10 +67,48 @@ func Read() (err error) {
 	return
 }
 
+func block() {
+
+	go func() {
+		dao := NewSvc()
+		defer dao.Close()
+
+		session := dao.GetDaos().GetDb()
+
+		session.Begin()
+
+		var users []*ydaos.User
+
+		session.Select("*").Where("age>?", 20).ForUpdate().Find(&users)
+
+		//session.Commit()
+
+		fmt.Println("select users are:", users)
+	}()
+
+	//go func() {
+	//	dao := NewSvc()
+	//	defer dao.Close()
+	//
+	//	session := dao.GetDaos().GetDb()
+	//
+	//	session.Begin()
+	//
+	//	session.Where("id=?", )
+	//
+	//}()
+
+	<-time.After(time.Second * 20)
+
+}
+
 func UseYorm() {
-	DeleteAll()
-	Create()
-	Read()
-	Update()
+	//DeleteAll()
+	//Create()
+	//Read()
+	//Update()
 	//Delete()
+
+	//insertMulti()
+	block()
 }

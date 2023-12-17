@@ -85,3 +85,9 @@ func changeInForRange() {
 	}
 	fmt.Println(sl[0], sl[1])
 }
+
+func JustAllocNotInitInStruct() {
+	a := StructSlice{}
+	a.arr = append(a.arr, 1)
+	fmt.Println(a)
+}

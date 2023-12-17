@@ -284,45 +284,45 @@ func hashOperate() {
 	conn := GetRedis()
 	defer conn.Close()
 
-	conn.Do(hset, "user:1:info", "age", 23)
-	conn.Do(hset, "user:1:info", "height", 160)
-	val, _ := redis.Int(conn.Do(hget, "user:1:info", "age"))
-	fmt.Println("hset hget", val)
+	//conn.Do(hset, "user:1:info", "age", 23)
+	//conn.Do(hset, "user:1:info", "height", 160)
+	//val, _ := redis.Int(conn.Do(hget, "user:1:info", "age"))
+	//fmt.Println("hset hget", val)
+	//
+	////hgetall
+	//val2, err := redis.Strings(conn.Do(hgetall, "user:1:info"))
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println("hgetall as []string", val2)
+	//
+	//val3, err := redis.StringMap(conn.Do(hgetall, "user:1:info"))
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println("hgetall as map[string]string", val3)
+	//
+	//val4, err := redis.Bool(conn.Do(hexists, "user:1:info", "age"))
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println("hexists", val4)
+	//
+	//val5, err := redis.Int(conn.Do(hlen, "user:1:info"))
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println("hlen", val5)
+	//
+	//val6, err := redis.String(conn.Do(hmset, "user:1:info", "weight", 60, "hair", "long_black")) //返回的竟然是"OK"
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println("hmset", val6)
+	//val62, err := redis.StringMap(conn.Do(hgetall, "user:1:info"))
+	//fmt.Println("hmset", val62)
 
-	//hgetall
-	val2, err := redis.Strings(conn.Do(hgetall, "user:1:info"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("hgetall as []string", val2)
-
-	val3, err := redis.StringMap(conn.Do(hgetall, "user:1:info"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("hgetall as map[string]string", val3)
-
-	val4, err := redis.Bool(conn.Do(hexists, "user:1:info", "age"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("hexists", val4)
-
-	val5, err := redis.Int(conn.Do(hlen, "user:1:info"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("hlen", val5)
-
-	val6, err := redis.String(conn.Do(hmset, "user:1:info", "weight", 60, "hair", "long_black")) //返回的竟然是"OK"
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("hmset", val6)
-	val62, err := redis.StringMap(conn.Do(hgetall, "user:1:info"))
-	fmt.Println("hmset", val62)
-
-	val7, err := redis.Strings(conn.Do(hmget, "user:1:info", "weight", "hair")) //这里如果用stringMap来获取的话会得到不合逻辑的结果，stringMap只是把每两个字符串转化为key:pair
+	val7, err := redis.Ints(conn.Do(hmget, "user:1:info", "weight", "hair")) //这里如果用stringMap来获取的话会得到不合逻辑的结果，stringMap只是把每两个字符串转化为key:pair
 	if err != nil {
 		fmt.Println(err)
 	}

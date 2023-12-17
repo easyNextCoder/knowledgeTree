@@ -49,7 +49,7 @@ func Test_channelAsLock4(t *testing.T) {
 		name string
 	}{
 		// TODO: Add test cases.
-		{name: "channelAsLock4 main"},
+		{name: "无缓存先接后发"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -184,16 +184,44 @@ func Test_channelAsLockWithCache(t *testing.T) {
 	}
 }
 
-func Test_channelAsLockWithCache0(t *testing.T) {
+func Test_channelAsLockWithCache1(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
 		// TODO: Add test cases.
-
+		{name: "先接收，有缓存"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			channelAsLockWithCache0()
+			channelAsLockWithCache1()
+		})
+	}
+}
+
+func Test_channelAsLock3(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		// TODO: Add test cases.
+		{name: "有缓存先发后接"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			channelAsLock3()
+		})
+	}
+}
+
+func Test_channelAsLock4_0(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		// TODO: Add test cases.
+		{name: "无缓存先接后发"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			channelAsLock4_0()
 		})
 	}
 }

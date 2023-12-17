@@ -51,7 +51,25 @@ func work1() {
 	fmt.Println(a, b)
 }
 
-func run() {
-	pointer_pointer()
+func changeInt(a int) int {
+	a = 10
+	return 100
+}
 
+func changeIntPtr(p *int) {
+
+	res := changeInt(*p)
+	*p = 900
+	fmt.Println(*p, res)
+}
+
+func changeIntPtrPtr() {
+	var x int = 99
+	changeIntPtr(&x)
+	fmt.Println("first", x)
+}
+
+func run() {
+	//pointer_pointer()
+	changeIntPtrPtr()
 }

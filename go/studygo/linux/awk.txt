@@ -1,0 +1,16 @@
+
+stderr5.log.1:[ERR]2023/12/13 00:48:12 room.go:3537: Room(478575252) autoEntrust enter. uid(26830063), cards num(2), roomId(478575252)
+stderr5.log.10:[ERR]2023/12/04 00:20:05 room.go:3535: Room(474909065) autoEntrust enter. uid(22085671), cards num(3), roomId(474909065)
+stderr5.log.14:[ERR]2023/11/30 01:15:32 room.go:3523: Room(473439791) autoEntrust enter. uid(22147476), cards num(2), roomId(473439791)
+stderr5.log.17:[ERR]2023/11/26 18:34:42 room.go:3523: Room(472143494) autoEntrust enter. uid(19014503), cards num(2), roomId(472143494)
+stderr5.log.17:[ERR]2023/11/26 19:32:40 room.go:3523: Room(472161208) autoEntrust enter. uid(29434835), cards num(2), roomId(472161208)
+stderr5.log.20:[ERR]2023/11/23 18:45:42 room.go:3523: Room(471017182) autoEntrust enter. uid(17948450), cards num(3), roomId(471017182)
+stderr5.log.23:[ERR]2023/11/20 20:29:58 room.go:3523: Room(469911225) autoEntrust enter. uid(14849578), cards num(2), roomId(469911225)
+stderr5.log.27:[ERR]2023/11/16 13:51:59 room.go:3523: Room(468286344) autoEntrust enter. uid(37385127), cards num(3), roomId(468286344)
+stderr5.log.29:[ERR]2023/11/14 03:35:49 room.go:3523: Room(467372435) autoEntrust enter. uid(35213502), cards num(5), roomId(467372435)
+stderr5.log.3:[ERR]2023/12/10 19:13:53 room.go:3537: Room(477596656) autoEntrust enter. uid(38059847), cards num(2), roomId(477596656)
+stderr5.log.3:[ERR]2023/12/11 08:08:23 room.go:3537: Room(477846354) autoEntrust enter. uid(14577140), cards num(2), roomId(477846354)
+stderr5.log.4:[ERR]2023/12/10 04:19:15 room.go:3537: Room(477363710) autoEntrust enter. uid(18835865), cards num(6), roomId(477363710)
+stderr5.log.5:[ERR]2023/12/09 14:09:27 room.go:3537: Room(477078790) autoEntrust enter. uid(17382218), cards num(2), roomId(477078790)
+stderr5.log.8:[ERR]2023/12/06 04:06:19 room.go:3535: Room(475770988) autoEntrust enter. uid(26303146), cards num(4), roomId(475770988)
+

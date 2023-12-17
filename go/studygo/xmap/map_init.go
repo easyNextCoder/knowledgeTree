@@ -1,6 +1,10 @@
 package xmap
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"unsafe"
+)
 
 func do_something() {
 	fmt.Println("do something")
@@ -44,5 +48,13 @@ func mapInit() {
 	ar, av := structPointerMap[3]
 	at := structPointerMap[3]
 	fmt.Println("指针类型map，访问不存在的key，返回的结果以及格式", ar, av, at, at == nil)
+
+	arrayMap := map[int][]int{}
+	arrayMap[0] = append(arrayMap[0], 100)
+	arr := arrayMap[0]
+	arr = append(arr, 1)
+	c := arrayMap[0]
+
+	fmt.Printf("数组类型的map， 访问不存在的key，返回的结果 %v %v %v %v %v %v", arr, len(arr), arr == nil, arrayMap[0], (*reflect.SliceHeader)(unsafe.Pointer(&arr)).Data, (*reflect.SliceHeader)(unsafe.Pointer(&c)).Data)
 
 }

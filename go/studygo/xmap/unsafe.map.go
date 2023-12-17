@@ -162,3 +162,27 @@ func Safe_map_chan() {
 	//}
 	time.Sleep(time.Second * 5)
 }
+
+// 并发删除和写会panic
+func xmapWork() {
+	m := make(map[int]int)
+
+	go func() {
+		for {
+			for i := 0; i < 10; i++ {
+				m[i] = 0
+			}
+		}
+
+	}()
+
+	go func() {
+		for {
+			for i := 0; i < 10; i++ {
+				delete(m, i)
+			}
+		}
+
+	}()
+	time.Sleep(10)
+}

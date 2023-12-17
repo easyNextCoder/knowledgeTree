@@ -1,6 +1,9 @@
 package ydaos
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type UserMessage struct {
 	Id             int64     `xorm:"not null pk autoincr BIGINT(20)"`
@@ -30,6 +33,11 @@ type UserMessage struct {
 
 type User struct {
 	Id   int64  `xorm:"not null pk autoincr BIGINT(20)"`
-	Uid  int64  `xorm:"not null INT(11) index"`
+	Uid  int64  `xorm:"not null BIGINT(20) index"`
 	Name string `xorm:"not null text"`
+	Age  int    `xorm:"not null default(0)"`
+}
+
+func (s *User) String() string {
+	return fmt.Sprintf("(id:%d uid:%d name:%s age:%d)", s.Id, s.Uid, s.Name, s.Age)
 }

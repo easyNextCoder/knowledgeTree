@@ -86,3 +86,13 @@ func usePointerAsReceiver() {
 	fmt.Println(p)
 
 }
+
+//结构体中允许定义匿名变量
+type structx struct {
+	string
+}
+
+func structxWork() {
+	x := structx{"hello"}
+	fmt.Println(x.string)
+}

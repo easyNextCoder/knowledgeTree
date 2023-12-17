@@ -8,6 +8,6 @@ func makeSliceWork() {
 	fmt.Println(x, len(x), cap(x))
 
 	y := make([]int, 10)
-	y = append(y, 5)
+	y = append(y, 5) //屏蔽前后cap不同
 	fmt.Println(y, len(y), cap(y))
 }

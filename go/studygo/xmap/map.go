@@ -204,3 +204,48 @@ func runWithFunc(a map[int]int) {
 		a[i] = 100
 	}
 }
+
+var mp = map[int]int{}
+
+func getWhenAssignMap() {
+
+	assign := func(i int) {
+
+		for i := 0; i < 100; i++ {
+			mp = map[int]int{ //先赋值map后更改的危害,999是默认值
+				1: 999,
+			}
+
+		}
+
+		mp = map[int]int{
+			1: i,
+		}
+		fmt.Println("set", i)
+	}
+
+	read := func() {
+		for {
+			fmt.Println(mp[1])
+		}
+	}
+
+	var i = 8
+
+	go read()
+	go read()
+	go read()
+	go func() {
+		tick := time.Tick(time.Millisecond * 5)
+		select {
+		case <-tick:
+			fmt.Println("assigning")
+			assign(i)
+			i++
+		case <-time.After(time.Millisecond * 8):
+			return
+		}
+	}()
+
+	time.Sleep(time.Millisecond * 10)
+}

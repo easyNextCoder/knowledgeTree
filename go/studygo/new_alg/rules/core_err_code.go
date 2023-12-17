@@ -1,7 +1,0 @@
-package rules
-
-const (
-	ERR_CORE_NONE = iota
-	ERR_CORE_OUT_ONCE_NOT_ALLOWED
-	ERR_CORE_NOT_ENOUGH_SCORE
-)

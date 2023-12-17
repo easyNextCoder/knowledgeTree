@@ -94,9 +94,9 @@ func structDefine() {
 }
 
 func intChan() {
-	x := make(chan int)
+	//x := make(chan int)
 
-	//var x chan int
+	var x chan int
 
 	sw := sync.WaitGroup{}
 
